@@ -23,7 +23,7 @@ export default {
   components: {BarUserMenu},
   data() {
     return {
-      title: 'CHẤM ĐIỂM VĂN HÓA XÃ PHƯỜNG - TP. SA ĐÉC'
+      title: 'PHẦN MỀM ĐÁNH GIÁ CÁC DANH HIỆU VĂN HÓA'
     }
   },
   computed: {

@@ -58,7 +58,7 @@
               <span v-else>-</span>
             </template>
             <template #[`item.roles`]="{ value }">
-              <span v-if="value.length > 0">
+              <span v-if="value.length > 0" class="d-flex flex-nowrap">
 
                 <v-chip
                     label
@@ -67,6 +67,7 @@
                     v-for="v of value"
                     :key="v.id"
                     :color="colors[(v.id - 1) > 0 ? v.id - 1 : 0 ]"
+                    class="me-2"
                 >{{ v.name }}</v-chip>
               </span>
               <span v-else>-</span>

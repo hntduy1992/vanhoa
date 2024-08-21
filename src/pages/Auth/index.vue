@@ -6,7 +6,7 @@
           <v-row dense align="center" style="background: #4076b4; height: 114px" no-gutters>
             <v-col cols="7">
               <div class="white--text pa-4 font-tahoma">
-                <h4>PHẦN MỀM ĐÁNH GIÁ DANH HIỆU VĂN HOÁ</h4>
+                <h4>PHẦN MỀM ĐÁNH GIÁ CÁC DANH HIỆU VĂN HÓA</h4>
                 <p>Đăng nhập vào hệ thống.</p>
               </div>
             </v-col>
