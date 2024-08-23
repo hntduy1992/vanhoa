@@ -15,11 +15,11 @@
             v-if="question.kieuNhapLieu === 'Text'"
             v-model="formInput"
             dense
-            hide-details
             outlined
             label="Nhập điểm"
             :disabled="disableTuDanhGia"
             @change="fnChangePoint"
+            :rules="[()=>formInput<=question.diemLonNhat||'Giá trị vượt giới hạn']"
         />
         <v-select
             v-else-if="question.kieuNhapLieu === 'Select'"

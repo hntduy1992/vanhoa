@@ -3,7 +3,7 @@
     v-if="item.url"
     :key="item.id"
     :to="item.url"
-    color="#4076b4"
+    color="var(--primary-color)"
     link
   >
     <v-list-item-icon v-if="item.icon">

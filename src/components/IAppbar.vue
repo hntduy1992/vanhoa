@@ -3,7 +3,7 @@
     :clipped-left="clipped"
     fixed
     app
-    color="#4076b4"
+    color="#5E35B1"
     dark
     elevation="0"
   >

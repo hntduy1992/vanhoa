@@ -8,6 +8,8 @@ import store from './store'
 import acl from './plugins/acl'
 import VueMeta from 'vue-meta'
 
+import './style.css'
+
 
 Vue.config.productionTip = false
 

@@ -242,7 +242,7 @@ export default {
         cauHoi: this.cauHoi,
         danhMuc: this.categoryId
       }).then((res) => {
-        window.location.href = process.env.VUE_APP_BASE_URL + 'storage/files/BienBan/' + res.data.file
+        window.location.href = process.env.VUE_APP_BASE_URL + 'storage/TuDanhGia/' + res.data.file
       })
     },
     async fnGetDanhMuc() {

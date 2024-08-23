@@ -3,24 +3,22 @@
     <v-row justify="center" align="center">
       <v-col md="8" lg="6" xl="5">
         <v-card max-width="456" class="mx-auto">
-          <v-row dense align="center" style="background: #4076b4; height: 114px" no-gutters>
-            <v-col cols="7">
+          <v-row dense align="center" style="background: #5E35B1; height: 114px" no-gutters>
+            <v-col cols="10">
               <div class="white--text pa-4 font-tahoma">
-                <h4>PHẦN MỀM ĐÁNH GIÁ CÁC DANH HIỆU VĂN HÓA</h4>
-                <p>Đăng nhập vào hệ thống.</p>
+                <h2 class="text-center">PHẦN MỀM ĐÁNH GIÁ CÁC DANH HIỆU VĂN HÓA</h2>
               </div>
             </v-col>
-            <v-col cols="5" align-self="end">
-              <v-img height="114" contain src="@/assets/images/work.png"/>
+            <v-col cols="2">
+              <v-img src="@/assets/images/sadec.png"/>
             </v-col>
           </v-row>
           <v-card-text class="pa-6 pt-0">
+
             <v-form @submit.prevent="fnLogin">
               <validation-observer ref="observer">
-                <div class="mb-6" style="margin-top: -28px">
-                  <v-avatar size="65">
-                    <v-img src="@/assets/images/sadec.png"/>
-                  </v-avatar>
+                <div class="py-3" >
+                  <h2 class="text-center">Vui lòng đăng nhập</h2>
                 </div>
                 <div>
                   <VTextValidation
@@ -59,7 +57,7 @@
                 </div>
                 <v-btn
                     block
-                    color="blue"
+                    color="#5E35B1"
                     dark
                     elevation="0"
                     :loading="loading"

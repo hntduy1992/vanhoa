@@ -6,7 +6,7 @@
         :key="item.name"
         no-action
         link
-        color="red"
+        color="var(--primary-color)"
       >
         <template #activator>
           <v-list-item-icon v-if="item.icon">
