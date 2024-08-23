@@ -156,6 +156,7 @@ export default {
       this.$axios.post('auth/don-vi/them-moi', donViHanhChinhModel.toJson(this.org)).then((res) => {
         this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
         this.fnReset()
+        // this.$router.push({path: '/Auth/DonViHanhChinh'})
       }).catch().finally(() => {
         this.loading = false
       })

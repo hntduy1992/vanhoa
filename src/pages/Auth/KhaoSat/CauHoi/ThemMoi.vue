@@ -52,7 +52,7 @@
                       v-model="item.stt"
                       dense
                       outlined
-                      label="Số thứ tự"
+                      label="Mục"
                   />
                 </v-col>
                 <v-col cols="12" sm="10" md="11">
@@ -64,45 +64,7 @@
                       :rules="{ required: true }"
                   />
                 </v-col>
-                <v-col cols="12" sm="3" md="2">
-                  <VTextValidation
-                      v-model="item.diemNhoNhat"
-                      dense
-                      outlined
-                      label="Điểm nhỏ nhất"
-                      :rules="{ required: true }"
-                  />
-                </v-col>
-                <v-col cols="12" sm="3" md="2">
-                  <VTextValidation
-                      v-model="item.buocNhay"
-                      dense
-                      outlined
-                      label="Bước nhảy"
-                      :rules="{ required: true }"
-                  />
-                </v-col>
-                <v-col cols="12" sm="3" md="2">
-                  <VTextValidation
-                      v-model="item.diemLonNhat"
-                      dense
-                      outlined
-                      label="Điểm lớn nhất"
-                      :rules="{ required: true }"
-                  />
-                </v-col>
-                <v-col cols="12" sm="3" md="2">
-                  <v-select
-                      v-model="item.loaiDieuKien"
-                      dense
-                      outlined
-                      label="Điều kiện"
-                      item-text="name"
-                      item-value="code"
-                      :items="[{ code: 'AND', name: 'AND (và)' }, { code: 'OR', name: 'OR (hoặc)' }]"
-                  />
-                </v-col>
-                <v-col cols="12" sm="4" md="2">
+                <v-col cols="12" sm="4" md="4">
                   <v-select
                       v-model="item.danhDauCau"
                       dense
@@ -113,7 +75,18 @@
                       :items="[{ code: 0, name: 'Câu hỏi cấp trên' }, { code: 1, name: 'Câu hỏi' }, { code: 2, name: 'Câu trả lời' }]"
                   />
                 </v-col>
-                <v-col cols="12" sm="4" md="2">
+                <v-col cols="12" sm="3" md="4">
+                  <v-select
+                      v-model="item.loaiDieuKien"
+                      dense
+                      outlined
+                      label="Điều kiện"
+                      item-text="name"
+                      item-value="code"
+                      :items="[{ code: 'AND', name: 'AND (và)' }, { code: 'OR', name: 'OR (hoặc)' }]"
+                  />
+                </v-col>
+                <v-col cols="12" sm="4" md="4">
                   <v-select
                       v-model="item.kieuNhapLieu"
                       dense
@@ -125,7 +98,34 @@
                       :items="[{ code: 'Text', name: 'Nhập điểm (Input)' }, { code: 'Select', name: 'Chọn điểm (Select)' }, { code: 'Checkbox', name: 'Chọn điểm (Checkbox)' }, { code: 'Radio', name: 'Chọn điểm (Radio)' }]"
                   />
                 </v-col>
-                <v-col cols="12" sm="4" md="6">
+                <v-col cols="12" sm="3" md="3">
+                  <VTextValidation
+                      v-model="item.diemNhoNhat"
+                      dense
+                      outlined
+                      label="Điểm nhỏ nhất"
+                      :rules="{ required: true }"
+                  />
+                </v-col>
+                <v-col cols="12" sm="3" md="3">
+                  <VTextValidation
+                      v-model="item.buocNhay"
+                      dense
+                      outlined
+                      label="Bước nhảy"
+                      :rules="{ required: true }"
+                  />
+                </v-col>
+                <v-col cols="12" sm="3" md="3">
+                  <VTextValidation
+                      v-model="item.diemLonNhat"
+                      dense
+                      outlined
+                      label="Điểm lớn nhất"
+                      :rules="{ required: true }"
+                  />
+                </v-col>
+                <v-col cols="12" sm="4" md="6" hidden>
                   <v-select
                       v-model="item.loaiCauHoi"
                       dense
@@ -136,7 +136,7 @@
                       :items="[{ code: 1, name: 'Đánh giá' }, { code: 2, name: 'Điều tra xã hội học' }]"
                   />
                 </v-col>
-                <v-col cols="12" sm="12" md="6">
+                <v-col cols="12" sm="12" md="3">
                   <v-select
                       v-model="item.trangThai"
                       dense
