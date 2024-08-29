@@ -443,6 +443,8 @@ export default {
     if (this.$route.query.thamDinhLai == 1) {
       this.ghiChuYKien = this.question?.ykien?.noiDung
     }
+    console.log(this.permissions);
+    
   }
 }
 </script>
