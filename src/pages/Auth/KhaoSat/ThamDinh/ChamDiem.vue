@@ -212,14 +212,20 @@ export default {
       this.total2 = total2
     }
   },
-  async created() {
+  mounted() {
     this.categoryId = this.$route.query.categoryId
-    await this.fnGetDanhMuc()
-    await this.fnGetAvailable()
+     this.fnGetDanhMuc()
+     this.fnGetAvailable()
   },
+  // async created() {
+  // this.categoryId = this.$route.query.categoryId
+  // this.fnGetDanhMuc()
+  // this.fnGetAvailable()
+  // },
+  //
   methods: {
-    async fnGetDanhMuc() {
-      await this.$axios.get('auth/khao-sat/tham-dinh/danh-muc', {params: {namApDung: this.year}}).then((res) => {
+     fnGetDanhMuc() {
+       this.$axios.get('auth/khao-sat/tham-dinh/danh-muc', {params: {namApDung: this.year}}).then((res) => {
         this.categories = (res.data?.data).map(item => ({
           id: item.id,
           name: item.tenDanhMuc
@@ -268,8 +274,8 @@ export default {
         }, 1)
       }).catch()
     },
-    async fnGetAvailable() {
-      await this.$axios.post('auth/khao-sat/tham-dinh/kiem-tra-hop-le', {
+     fnGetAvailable() {
+       this.$axios.post('auth/khao-sat/tham-dinh/kiem-tra-hop-le', {
         maDanhMuc: this.categoryId,
         maDonVi: this.$route.params.orgId
       })

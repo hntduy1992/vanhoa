@@ -179,7 +179,7 @@ export default {
     years() {
       const year = []
       const current = (new Date().getFullYear()) + 2
-      for (let i = 2022; i < current; i++) {
+      for (let i = current; i < current; i++) {
         year.push({
           id: i,
           name: `Năm ${i}`

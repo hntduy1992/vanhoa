@@ -319,7 +319,9 @@ export default {
           this.$store.commit('khaoSatStore/bangDiem', bangDiem)
           this.$store.commit('khaoSatStore/cauHoi', cauHoi)
         }, 1)
-      }).catch()
+      }).catch((err)=>{
+        this.$store.dispatch('SnackbarStore/showSnackBar', err.response.data)
+      })
     },
     async fnGetAvailable() {
       await this.$axios.post('auth/khao-sat/tu-danh-gia/kiem-tra-y-kien-hop-le', {
