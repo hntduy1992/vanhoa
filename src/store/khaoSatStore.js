@@ -71,6 +71,7 @@ export const mutations = {
         state.disableYKien = item
     },
     permissions(state, item) {
+        localStorage.setItem('permissions',item)
         state.permissions = item
     }
 }

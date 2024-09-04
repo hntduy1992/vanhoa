@@ -62,7 +62,7 @@
                   <CauHoi :key="item + idx" :question="item"/>
                 </template>
                 <template v-if="item.danhDauCau >= 2">
-                  <CauTraLoi :key="item + idx" :question="item"/>
+                  <CauTraLoi :key="item + idx" :question="item"/> 
                 </template>
               </template>
               </tbody>
@@ -295,7 +295,9 @@ export default {
       })
       this.$axios.post('auth/khao-sat/tham-dinh/luu-diem', result)
           .then((res) => {
-            this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
+            this.$store.dispatch('SnackbarStore/showSnackBar', res.data);
+            this.$router.push({name:'ThamDinh'})
+            
           }).catch().finally(() => {
         this.isSubmitting = false
       })
