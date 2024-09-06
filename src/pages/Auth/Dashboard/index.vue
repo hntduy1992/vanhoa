@@ -1,61 +1,10 @@
 <template>
   <LayoutDefault>
-    <v-row>
-      <v-col cols="12" md="4" class="text-center">
-        <v-card>
-          <v-card-text>
-            <v-row align="center" justify="center">
-              <v-col
-                  class="text-h2"
-                  cols="12"
-              >
-                0
-              </v-col>
-              <v-col cols="12">
-                <h4>Hạng hiện tại</h4>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="4" class="text-center">
-        <v-card>
-          <v-card-text>
-            <v-row align="center" justify="center">
-              <v-col
-                  class="text-h2"
-                  cols="12"
-              >
-                0
-              </v-col>
-              <v-col cols="12">
-                <h4>Hạng lần trước</h4>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="4" class="text-center">
-        <v-card>
-          <v-card-text>
-            <v-row align="center" justify="center">
-              <v-col
-                  class="text-h2"
-                  cols="12"
-              >
-                0
-              </v-col>
-              <v-col cols="12">
-                <h4>Độ lệch</h4>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="6" v-if="$can('xacnhandiem')">
+    <v-row v-if="$can('xacnhandiem')">
+      <v-col cols="12" md="6">
         <v-card>
           <v-toolbar dense elevation="0" class="py-3">
-            <h4>BẢNG XẾP HẠNG</h4>
+            <h4>XÃ, PHƯỜNG, THỊ TRẤN TIÊU BIỂU</h4>
             <v-spacer/>
             <div style="width: 80px">
               <v-select v-model="namApDung" hide-details dense :items="[2021, 2022]"/>
@@ -66,16 +15,22 @@
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" :md="$can('xacnhandiem') ? '6': '12'">
+      <v-col cols="12" md="6">
         <v-card>
           <v-toolbar dense elevation="0" class="py-3">
-            <h4>BẢNG ĐIỂM ĐƠN VỊ</h4>
+            <h4>KHÓM, ẤP VĂN HÓA</h4>
             <v-spacer/>
           </v-toolbar>
           <v-card-text>
             <v-chart class="chart" autoresize :option="chartXepHangDonVi"/>
           </v-card-text>
         </v-card>
+      </v-col>
+    </v-row>
+    <v-row v-else>
+      <v-col cols="12">
+        <h4>THỐNG KÊ CÁC DANH HIỆU VĂN HÓA</h4>
+        <static-dashboard></static-dashboard>
       </v-col>
     </v-row>
   </LayoutDefault>
@@ -92,6 +47,7 @@ import {
 } from 'echarts/components'
 import VChart from 'vue-echarts'
 import LayoutDefault from "@/layouts/default";
+import StaticDashboard from "@/pages/Auth/Dashboard/staticDashboard.vue";
 
 use([
   TitleComponent,
@@ -105,8 +61,9 @@ use([
 export default {
   name: 'dashboard-index',
   components: {
+    StaticDashboard,
     LayoutDefault,
-    VChart
+    VChart,
   },
   inject: ['siteNameTemplate'],
   metaInfo() {
@@ -216,10 +173,9 @@ export default {
         const donVi = []
         const data = []
         for (const [key, value] of Object.entries(res.data.data)) {
-          if(value>=3){
-            donVi.push('(Đạt) ' + key )
-          }
-          else{
+          if (value >= 3) {
+            donVi.push('(Đạt) ' + key)
+          } else {
             donVi.push(key)
           }
           data.push(value)

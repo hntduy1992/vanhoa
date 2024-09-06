@@ -5,7 +5,8 @@ const toJson = (item) => {
     email: item.email,
     dienThoai: item.dienThoai,
     parentId: item.parentId ?? 0,
-    trangThai: item.trangThai
+    trangThai: item.trangThai,
+    phanLoai:item.phanLoai
   }
 }
 
@@ -17,7 +18,8 @@ const fromJson = (item) => {
     dienThoai: item.dienThoai,
     parentId: item.parentId,
     capTren: item.parent,
-    trangThai: item.trangThai
+    trangThai: item.trangThai,
+    phanLoai:item.phanLoai
   }
 }
 
@@ -28,7 +30,8 @@ const baseJson = () => {
     email: null,
     dienThoai: null,
     parentId: 0,
-    trangThai: 1
+    trangThai: 1,
+    phanLoai:null
   }
 }
 

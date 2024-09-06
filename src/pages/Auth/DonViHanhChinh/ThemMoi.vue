@@ -36,7 +36,7 @@
                       :rules="{ required: true }"
                   />
                 </v-col>
-                <v-col cols="12" sm="4" md="4">
+                <v-col cols="12" >
                   <VTextValidation
                       v-model="org.email"
                       dense
@@ -63,6 +63,18 @@
                       item-text="name"
                       item-value="id"
                       :items="[ { id: 1, name: 'Hoạt động'}, { id: 2, name: 'Tạm khóa'} ]"
+                      :return-object="false"
+                  />
+                </v-col>
+                <v-col cols="12" sm="4" md="4">
+                  <v-select
+                      v-model="org.phanLoai"
+                      dense
+                      outlined
+                      label="Phân loại"
+                      item-text="name"
+                      item-value="id"
+                      :items="[ { id: 0, name: 'Phòng ban'}, { id: 1, name: 'Xã, Phường'},{ id: 2, name: 'Khóm, Ấp'} ]"
                       :return-object="false"
                   />
                 </v-col>
