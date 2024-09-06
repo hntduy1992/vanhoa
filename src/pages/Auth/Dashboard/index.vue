@@ -216,7 +216,12 @@ export default {
         const donVi = []
         const data = []
         for (const [key, value] of Object.entries(res.data.data)) {
-          donVi.push(key)
+          if(value>=3){
+            donVi.push('(Đạt) ' + key )
+          }
+          else{
+            donVi.push(key)
+          }
           data.push(value)
         }
         this.chartXepHang.yAxis.data = donVi
