@@ -63,6 +63,11 @@ export default {
 </template>
 
 <style scoped>
+th{
+  font-size: 16pt !important;
+  font-weight: bold;
+  background-color: #ddd;
+}
 th, td {
   text-align: center !important;
   border-left: 1px solid #ccc;
