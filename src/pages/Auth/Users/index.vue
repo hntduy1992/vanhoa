@@ -195,7 +195,8 @@ export default {
       await this.axios.get('auth/users', {
         params: {
           page: this.pagination.page,
-          limit: this.pagination.itemsPerPage,
+          // limit: this.pagination.itemsPerPage,
+          limit: 100,
           sortBy: this.pagination.sortBy[0],
           sortDesc: this.pagination.sortDesc[0],
           content: this.keySearch

@@ -196,6 +196,7 @@ export default {
       this.axios.post('auth/users/edit/' + this.$route.params.id, userModel.toJson(this.user)).then((res) => {
         this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
         this.fnReset()
+        this.$router.push({'name':'Users'})
       }).catch().finally(() => {
         this.loading = false
       })

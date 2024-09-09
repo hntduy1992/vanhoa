@@ -49,15 +49,6 @@ export default {
       <td>{{ item.ka_dat_chuan }}</td>
       <td>{{ item.ka_ti_le }}%</td>
     </tr>
-    <tr >
-      <td>Trung bình</td>
-      <td>{{ (data.map(a=>a.xp_tong_so).reduce((a,b)=>a+b,0)/data.length).toFixed(2) }}</td>
-      <td>{{ (data.map(a=>a.xp_dat_chuan).reduce((a,b)=>a+b,0)/data.length).toFixed(2) }}</td>
-      <td>{{ (data.map(a=>a.xp_ti_le).reduce((a,b)=>a+b,0)/data.length).toFixed(2) }}%</td>
-      <td>{{ (data.map(a=>a.ka_tong_so).reduce((a,b)=>a+b,0)/data.length).toFixed(2) }}</td>
-      <td>{{ (data.map(a=>a.ka_dat_chuan).reduce((a,b)=>a+b,0)/data.length).toFixed(2) }}</td>
-      <td>{{ (data.map(a=>a.ka_ti_le).reduce((a,b)=>a+b,0)/data.length).toFixed(2) }}%</td>
-    </tr>
     </tbody>
   </v-simple-table>
 </template>

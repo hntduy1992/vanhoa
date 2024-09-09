@@ -1,38 +1,61 @@
 <template>
   <LayoutDefault>
-    <v-row v-if="$can('xacnhandiem')">
-      <v-col cols="12" md="6">
-        <v-card>
-          <v-toolbar dense elevation="0" class="py-3">
-            <h4>XÃ, PHƯỜNG, THỊ TRẤN TIÊU BIỂU</h4>
-            <v-spacer/>
-            <div style="width: 80px">
-              <v-select v-model="namApDung" hide-details dense :items="[2021, 2022]"/>
-            </div>
-          </v-toolbar>
-          <v-card-text>
-            <v-chart class="chart" autoresize :option="chartXepHang"/>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-card>
-          <v-toolbar dense elevation="0" class="py-3">
-            <h4>KHÓM, ẤP VĂN HÓA</h4>
-            <v-spacer/>
-          </v-toolbar>
-          <v-card-text>
-            <v-chart class="chart" autoresize :option="chartXepHangDonVi"/>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row v-else>
-      <v-col cols="12">
-        <h4>THỐNG KÊ CÁC DANH HIỆU VĂN HÓA</h4>
-        <static-dashboard></static-dashboard>
-      </v-col>
-    </v-row>
+    <v-tabs
+        fixed-tabs
+        background-color="var(--primary-color)"
+        dark
+    >
+      <v-tab>
+        ĐƠN VỊ ĐẠT DANH HIỆU
+      </v-tab>
+      <v-tab>
+        THỐNG KÊ THEO NĂM
+      </v-tab>
+      <v-tab-item
+          class="py-2 px-1"
+         :key="1"
+      >
+       <div class="d-flex justify-center align-center mb-2">
+         <label for="selectYear" class="v-label me-2" >Chọn năm </label>
+         <div style="width: 100px">
+           <v-select id="selectYear"  v-model="namApDung"  outlined hide-details dense>
+             <option v-for="item of this.namApDung" :key="item" :value="item" >{{item}}</option>
+           </v-select>
+         </div>
+       </div>
+        <v-row>
+          <v-col cols="12" md="6">
+            <v-card>
+              <v-toolbar dense elevation="0" class="py-3">
+                <h4>XÃ, PHƯỜNG, THỊ TRẤN TIÊU BIỂU</h4>
+              </v-toolbar>
+              <v-card-text>
+                <v-chart class="chart" autoresize :option="chartXepHang"/>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-card>
+              <v-toolbar dense elevation="0" class="py-3">
+                <h4>KHÓM, ẤP VĂN HÓA</h4>
+                <v-spacer/>
+              </v-toolbar>
+              <v-card-text>
+                <v-chart class="chart" autoresize :option="chartXepHangDonVi"/>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-tab-item>
+      <v-tab-item :key="2">
+        <v-row>
+          <v-col cols="12">
+            <static-dashboard></static-dashboard>
+          </v-col>
+        </v-row>
+      </v-tab-item>
+    </v-tabs>
+
   </LayoutDefault>
 </template>
 
@@ -40,11 +63,7 @@
 import {use} from 'echarts/core'
 import {CanvasRenderer} from 'echarts/renderers'
 import {BarChart} from 'echarts/charts'
-import {
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent, GridComponent
-} from 'echarts/components'
+import {GridComponent, LegendComponent, TitleComponent, TooltipComponent} from 'echarts/components'
 import VChart from 'vue-echarts'
 import LayoutDefault from "@/layouts/default";
 import StaticDashboard from "@/pages/Auth/Dashboard/staticDashboard.vue";
@@ -119,13 +138,13 @@ export default {
         ]
       },
       chartXepHangDonVi: {
-        legend: {},
         tooltip: {
           trigger: 'axis',
           axisPointer: {
             type: 'shadow'
           }
         },
+        legend: {},
         grid: {
           left: '3%',
           right: '4%',
@@ -133,20 +152,18 @@ export default {
           containLabel: true
         },
         xAxis: {
-          type: 'category',
-          data: []
+          type: 'value'
         },
         yAxis: {
-          type: 'value'
+          type: 'category',
+          data: []
         },
         series: [
           {
             name: 'Tổng điểm',
-            data: [],
             type: 'bar',
-            showBackground: true,
-            backgroundStyle: {
-              color: 'rgba(180, 180, 180, 0.2)'
+            itemStyle: {
+              color: '#a90000'
             },
             label: {
               show: true,
@@ -156,7 +173,7 @@ export default {
                 return param.data === 0 ? '' : param.data
               }
             },
-            barWidth: '35px'
+            data: []
           }
         ]
       },
@@ -166,10 +183,21 @@ export default {
   created() {
     this.fnGetBangXepHang()
     this.fnGetBangXepHangCuaDonVi()
+    this.fnGetNamApDung()
   },
   methods: {
+    fnGetNamApDung(){
+      this.$axios.get('auth/khao-sat/danh-muc/select-nam-ap-dung').then((res) => {
+        this.namApDung = res.data
+      })
+    },
     fnGetBangXepHang() {
-      this.$axios.get('auth/khao-sat/thong-ke/bang-xep-hang', {params: {namApDung: this.namApDung}}).then((res) => {
+      this.$axios.get('auth/khao-sat/thong-ke/bang-xep-hang', {
+        params: {
+          namApDung: this.namApDung,
+          phanLoai: 1
+        }
+      }).then((res) => {
         const donVi = []
         const data = []
         for (const [key, value] of Object.entries(res.data.data)) {
@@ -185,14 +213,23 @@ export default {
       })
     },
     fnGetBangXepHangCuaDonVi() {
-      this.$axios.get('auth/khao-sat/thong-ke/bang-xep-hang-don-vi').then((res) => {
-        const soNam = []
+      this.$axios.get('auth/khao-sat/thong-ke/bang-xep-hang', {
+        params: {
+          namApDung: this.namApDung,
+          phanLoai: 2
+        }
+      }).then((res) => {
+        const donVi = []
         const data = []
         for (const [key, value] of Object.entries(res.data.data)) {
-          soNam.push(key)
+          if (value >= 3) {
+            donVi.push('(Đạt) ' + key)
+          } else {
+            donVi.push(key)
+          }
           data.push(value)
         }
-        this.chartXepHangDonVi.xAxis.data = soNam
+        this.chartXepHangDonVi.yAxis.data = donVi
         this.chartXepHangDonVi.series[0].data = data
       })
     }
