@@ -138,8 +138,8 @@ export default {
       headers: [
         { text: 'STT', value: 'stt', width: 30, sortable: false },
         { text: 'Tiêu chí', value: 'tenCauHoi', width: 320 },
-        { text: 'Cấp trên', value: 'capTren.tenCauHoi', width: 320, sortable: false },
-        { text: 'Bộ tiêu chí', value: 'danhMuc.tenDanhMuc', width: 290, sortable: false },
+        { text: 'Điểm lớn nhất', value: 'diemLonNhat', width: 320, sortable: false },
+        { text: 'Kiểu nhập', value: 'kieuNhapLieu', width: 290, sortable: false },
         { text: null, value: 'action', align: 'right', width: 50, sortable: false }
       ],
       items: [],
@@ -165,7 +165,8 @@ export default {
       await this.$axios.get('auth/khao-sat/cau-hoi', {
         params: {
           page: this.pagination.page,
-          limit: this.pagination.itemsPerPage,
+          // limit: this.pagination.itemsPerPage,
+          limit: 1000,
           sortBy: this.pagination.sortBy[0],
           sortDesc: this.pagination.sortDesc[0] ? 1 : 0,
           content: this.keySearch

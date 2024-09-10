@@ -266,7 +266,7 @@ export default {
       this.$axios.post('auth/khao-sat/cau-hoi/id/' + this.$route.params.id, khaoSatCauHoiModel.toJson(this.item))
         .then((res) => {
           this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
-          this.fnReset()
+          this.$router.push({name:'CauHoi'})
         }).catch().finally(() => {
           this.loading = false
         })

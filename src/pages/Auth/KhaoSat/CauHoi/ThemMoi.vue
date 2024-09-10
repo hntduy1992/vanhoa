@@ -162,10 +162,16 @@
                 Lưu lại
               </v-btn>
             </v-card-actions>
-          </v-card>
+                      </v-card>
         </v-col>
       </v-row>
+      <div>
+        {{item}}
+        <br>
+        {{categoryId}}
+      </div>
     </validation-observer>
+
   </LayoutDefault>
 </template>
 
@@ -222,17 +228,17 @@ export default {
     this.fnGetCategories()
   },
   methods: {
-    async fnGetCategories() {
-      await this.$axios.get('auth/khao-sat/danh-muc/select').then((res) => {
+    fnGetCategories() {
+       this.$axios.get('auth/khao-sat/danh-muc/select').then((res) => {
         this.categories = (res.data.data).map(item => ({
           id: item.id,
           name: item.tenDanhMuc
         }))
       }).catch()
     },
-    async fnGetQuestions() {
+     fnGetQuestions() {
       this.isLoading = true
-      await this.$axios.get('auth/khao-sat/cau-hoi/tree', {
+       this.$axios.get('auth/khao-sat/cau-hoi/tree', {
         params: {
           categoryId: this.categoryId
         }
@@ -256,10 +262,19 @@ export default {
       }
       this.$axios.post('auth/khao-sat/cau-hoi/them-moi', khaoSatCauHoiModel.toJson(this.item)).then((res) => {
         this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
-        this.fnReset()
+        // this.fnReset()
+        this.fnContinues(res.data.data)
       }).catch().finally(() => {
         this.loading = false
       })
+    },
+    fnContinues(lastItem){
+      this.fnGetCategories()
+      this.fnGetQuestions()
+      this.item = khaoSatCauHoiModel.baseJson()
+      this.item.maDanhMuc = this.categoryId
+      this.item.parentId=lastItem.id
+      this.item.stt = lastItem.stt
     },
     async fnReset() {
       await this.$refs.observer.reset()
