@@ -165,11 +165,6 @@
                       </v-card>
         </v-col>
       </v-row>
-      <div>
-        {{item}}
-        <br>
-        {{categoryId}}
-      </div>
     </validation-observer>
 
   </LayoutDefault>

@@ -170,20 +170,26 @@ export default {
     ...mapState('khaoSatStore', ['disableTuDanhGia']),
     points() {
       const rPoints = []
-      let counter = JSON.parse(JSON.stringify(this.question.diemNhoNhat));
-      while (Number(counter.toFixed(2)) <= this.question.diemLonNhat) {
+      let counter = JSON.parse(JSON.stringify(this.question.diemLonNhat));
+      // select giam
+      do
+      {
         rPoints.push({
           id: Number(counter.toFixed(2)),
           name: counter.toFixed(2)
         })
-        counter += this.question.buocNhay
+        counter -= this.question.buocNhay
       }
-      /*for (let i = JSON.parse(JSON.stringify(this.question.diemNhoNhat)); i <= this.question.diemLonNhat; i += this.question.buocNhay) {
-        rPoints.push({
-          id: Number(i.toFixed(2)),
-          name: i.toFixed(2)
-        })
-      }*/
+      while (Number(counter.toFixed(2)) >= (this.question.diemNhoNhat && 0));
+      // select tang
+      // while (Number(counter.toFixed(2)) <= this.question.diemLonNhat) {
+      //   rPoints.push({
+      //     id: Number(counter.toFixed(2)),
+      //     name: counter.toFixed(2)
+      //   })
+      //   counter += this.question.buocNhay
+      // }
+
       return rPoints
     },
     parent() {
