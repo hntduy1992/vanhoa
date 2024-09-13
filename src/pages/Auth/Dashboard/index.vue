@@ -18,8 +18,7 @@
        <div class="d-flex justify-center align-center mb-2">
          <label for="selectYear" class="v-label me-2" >Chọn năm </label>
          <div style="width: 100px">
-           <v-select id="selectYear"  v-model="namApDung"  outlined hide-details dense>
-             <option v-for="item of this.namApDung" :key="item" :value="item" >{{item}}</option>
+           <v-select id="selectYear"  v-model="this.namApDung"  outlined hide-details dense :items="this.listNamApDung">
            </v-select>
          </div>
        </div>
@@ -177,7 +176,8 @@ export default {
           }
         ]
       },
-      namApDung: new Date().getFullYear()
+      namApDung: null,
+      listNamApDung:[]
     }
   },
   created() {
@@ -188,7 +188,8 @@ export default {
   methods: {
     fnGetNamApDung(){
       this.$axios.get('auth/khao-sat/danh-muc/select-nam-ap-dung').then((res) => {
-        this.namApDung = res.data
+        this.listNamApDung = res.data.data
+        this.namApDung = this.listNamApDung.length?this.listNamApDung[0]:null
       })
     },
     fnGetBangXepHang() {
