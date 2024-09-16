@@ -2,13 +2,28 @@
   <LayoutDefault>
     <v-row>
       <v-col cols="12">
-        <IBreadcrumb :items="breadcrumbs" />
+        <IBreadcrumb :items="breadcrumbs"/>
       </v-col>
       <v-col cols="12">
+        <v-card class="mb-2">
+          <v-card-text>
+            <VSelect
+                label="Bộ tiêu chí"
+                v-model="categoryId"
+                dense
+                item-text="name"
+                item-value="id"
+                :items="categories"
+                outlined
+                hide-details
+                :loading="loading2"
+            ></VSelect>
+          </v-card-text>
+        </v-card>
         <v-card>
           <v-toolbar dense elevation="0">
             <v-toolbar-title>DANH SÁCH</v-toolbar-title>
-            <v-spacer />
+            <v-spacer/>
             <v-text-field
                 v-model="keySearch"
                 label="Tìm kiếm"
@@ -44,7 +59,7 @@
               <span>Xóa </span>
             </v-tooltip>
           </v-toolbar>
-          <v-divider />
+          <v-divider/>
           <IDataTable
               :headers="headers"
               :items="items"
@@ -74,15 +89,15 @@
         >
           <v-card width="400">
             <v-card-title>HỆ THỐNG</v-card-title>
-            <v-divider />
+            <v-divider/>
             <v-card-text class="pa-4">
               <p style="font-size: 15px">
                 Mọi thông tin liên quan sẽ bị mất theo. Bạn chắc chắn muốn xóa?
               </p>
             </v-card-text>
-            <v-divider />
+            <v-divider/>
             <v-card-actions>
-              <v-spacer />
+              <v-spacer/>
               <v-btn
                   elevation="0"
                   color="warning darken-1"
@@ -108,7 +123,7 @@
 
 <script>
 
-import { khaoSatCauHoiModel } from '@/models/khaoSatCauHoiModel'
+import {khaoSatCauHoiModel} from '@/models/khaoSatCauHoiModel'
 import LayoutDefault from "@/layouts/default";
 import IDataTable from "@/components/IDataTable";
 import ContextMenu from "@/components/ContextMenu";
@@ -136,15 +151,18 @@ export default {
       pagination: null,
       keySearch: null,
       headers: [
-        { text: 'STT', value: 'stt', width: 30, sortable: false },
-        { text: 'Tiêu chí', value: 'tenCauHoi', width: 320 },
-        { text: 'Điểm lớn nhất', value: 'diemLonNhat', width: 320, sortable: false },
-        { text: 'Kiểu nhập', value: 'kieuNhapLieu', width: 290, sortable: false },
-        { text: null, value: 'action', align: 'right', width: 50, sortable: false }
+        {text: 'STT', value: 'stt', width: 30, sortable: false},
+        {text: 'Tiêu chí', value: 'tenCauHoi', width: 320},
+        {text: 'Điểm lớn nhất', value: 'diemLonNhat', width: 320, sortable: false},
+        {text: 'Kiểu nhập', value: 'kieuNhapLieu', width: 290, sortable: false},
+        {text: null, value: 'action', align: 'right', width: 50, sortable: false}
       ],
+      categories: [],
+      categoryId: null,
       items: [],
       totalRow: 0,
       loading: false,
+      loading2: false,
       dialog: false
     }
   },
@@ -157,28 +175,48 @@ export default {
       this._timerId = setTimeout(() => {
         this.fnGetList()
       }, 600)
+    },
+    categoryId() {
+      this.fnGetList()
     }
   },
+  created() {
+    this.fnGetCategories()
+  },
   methods: {
-    async fnGetList() {
+    fnGetCategories() {
+      this.loading2 = true
+      this.$axios.get('auth/khao-sat/danh-muc/select').then((res) => {
+        this.categories = (res.data.data).map(item => ({
+          id: item.id,
+          name: item.tenDanhMuc
+        }))
+      }).finally(() => {
+        this.loading2 = false
+        if (this.categories.length > 0)
+          this.categoryId = this.categories[0]
+      })
+    },
+    fnGetList() {
       this.loading = true
-      await this.$axios.get('auth/khao-sat/cau-hoi', {
+      this.$axios.get('auth/khao-sat/cau-hoi/', {
         params: {
           page: this.pagination.page,
           // limit: this.pagination.itemsPerPage,
           limit: 1000,
+          maDanhMuc: this.categoryId,
           sortBy: this.pagination.sortBy[0],
           sortDesc: this.pagination.sortDesc[0] ? 1 : 0,
           content: this.keySearch
         }
       })
-        .then((res) => {
-          this.items = (res.data.data).map(item => khaoSatCauHoiModel.fromJson(item))
-          this.totalRow = res.data.totalRow
-        })
-        .finally(() => {
-          this.loading = false
-        })
+          .then((res) => {
+            this.items = (res.data.data).map(item => khaoSatCauHoiModel.fromJson(item))
+            this.totalRow = res.data.totalRow
+          })
+          .finally(() => {
+            this.loading = false
+          })
     },
     fnConfirm(multi, item) {
       this.dialog = true
@@ -187,7 +225,7 @@ export default {
         this.rowSelected = []
       }
     },
-    async fnDelete() {
+    fnDelete() {
       this.dialog = false
       let ids = []
       if (this.rowSelected.length > 0) {
@@ -195,7 +233,7 @@ export default {
       } else {
         ids.push(this.singleSelected?.id)
       }
-      await this.$axios.post('auth/khao-sat/cau-hoi/xoa-cau-hoi', { ids }).then((res) => {
+      this.$axios.post('auth/khao-sat/cau-hoi/xoa-cau-hoi', {ids}).then((res) => {
         this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
         this.fnGetList()
       }).catch()
@@ -203,3 +241,8 @@ export default {
   }
 }
 </script>
+<style>
+.v-select__selections .v-select__selection {
+  line-height: 24px;
+}
+</style>
