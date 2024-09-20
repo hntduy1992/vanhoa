@@ -12,12 +12,12 @@
             <v-row>
               <v-col cols="12" sm="3">
                 <v-select
-                    v-model="year"
+                    v-model="namApDung"
                     dense
                     label="Năm đánh giá"
-                    item-text="name"
-                    item-value="id"
-                    :items="years"
+                    item-text="text"
+                    item-value="value"
+                    :items="namApDungs"
                 />
               </v-col>
               <v-col cols="12" sm="9">
@@ -54,7 +54,7 @@
                 <tbody>
                 <template v-for="(item, idx) in items">
                   <template v-if="item.danhDauCau < 2">
-                    <CauHoi :key="item + idx" :question="item"/>
+                    <CauHoi :key="item + idx" :question="item" :nam-ap-dung="namApDung.value"/>
                   </template>
                   <template v-if="item.danhDauCau >= 2">
                     <CauTraLoi :key="item + idx" :question="item"/>
@@ -154,6 +154,8 @@ export default {
       loading: false,
       questions: [],
       year: new Date().getFullYear(),
+      namApDung: 0,
+      namApDungs: [],
       categoryId: 0,
       categories: [],
       isSubmitting: false,
@@ -199,24 +201,18 @@ export default {
       ]
     }
   },
+
   computed: {
     ...mapState('khaoSatStore', ['bangDiem', 'cauHoi']),
-    years() {
-      const year = []
-      const current = (new Date().getFullYear()) + 2
-      for (let i = 2022; i < current; i++) {
-        year.push({
-          id: i,
-          name: `Năm ${i}`
-        })
-      }
-      return year.reverse()
-    }
   },
   watch: {
-    year() {
-      this.categoryId = 0
-      this.categories = []
+    // year() {
+    //   this.categoryId = 0
+    //   this.categories = []
+    //
+    //   this.fnGetDanhMuc()
+    // },
+    namApDung(){
       this.data = []
       this.fnGetDanhMuc()
     },
@@ -233,9 +229,18 @@ export default {
     }
   },
   created() {
-    this.fnGetDanhMuc()
+    this.fnGetNamApDung()
   },
   methods: {
+    fnGetNamApDung() {
+      this.$axios.get('auth/khao-sat/danh-muc/select-nam-ap-dung').then((res) => {
+        this.namApDungs = res.data.data.map((i) => ({
+          value: i,
+          text: i
+        }))
+        this.namApDung = this.namApDungs[0]
+      })
+    },
     async fnExportToWord() {
       await this.$axios.post('auth/file-manager/export-to-word', {
         bangDiem: this.bangDiem,
@@ -246,20 +251,20 @@ export default {
       })
     },
     async fnGetDanhMuc() {
-      await this.$axios.get('auth/khao-sat/tu-danh-gia/danh-muc', {params: {namApDung: this.year}}).then((res) => {
+      await this.$axios.get('auth/khao-sat/tu-danh-gia/danh-muc', {params: {namApDung: this.namApDung.value}}).then((res) => {
         this.categories = (res.data?.data).map(item => ({
           id: item.id,
           name: item.tenDanhMuc
         }))
         this.categoryId = this.categories[0]?.id
       }).catch()
-      await this.fnGetAvailable()
+      this.fnGetAvailable()
     },
     fnGetCauHoi() {
       this.$axios.get('auth/khao-sat/tu-danh-gia/cau-hoi', {
         params: {
           maDanhMuc: this.categoryId,
-          namApDung: this.year
+          namApDung: this.namApDung.value
         }
       }).then((res) => {
         this.iData = (res.data.data).map(d => khaoSatCauHoiModel.fromJson(d))

@@ -39,7 +39,7 @@
           />
         </div>
         <div v-if="fileName != null" class="text-center">
-          <v-tooltip top color="primary">
+          <v-tooltip v-for="(file,index) of fileName" :key="index" top color="primary">
             <template v-slot:activator="{ on, attrs }">
               <v-btn
                   color="blue-grey"
@@ -50,7 +50,7 @@
                   target="_blank"
                   v-bind="attrs"
                   v-on="on"
-                  :href="download()"
+                  :href="download(file.fileUrl)"
               >
                 <v-icon
                     dark
@@ -58,10 +58,10 @@
                 >
                   mdi-cloud-download
                 </v-icon>
-                <span class="ml-2">Tải về</span>
+                <span class="ml-2">{{ file.fileName }}</span>
               </v-btn>
             </template>
-            <span>{{ fileName.split('/').pop() }}</span>
+            <!--            <span>{{ fileName.split('/').pop() }}</span>-->
           </v-tooltip>
           <v-btn
               v-if="!disableTuDanhGia"
@@ -101,6 +101,10 @@ export default {
     question: {
       type: Object,
       default: null
+    },
+    namApDung: {
+      type: Number,
+      default: null
     }
   },
   data() {
@@ -132,8 +136,8 @@ export default {
     }
   },
   methods: {
-    download() {
-      return process.env.VUE_APP_BASE_URL + 'storage/' + this.fileName
+    download(fileUrl) {
+      return process.env.VUE_APP_BASE_URL + 'storage/' + fileUrl
     },
 
     async upload(files) {
@@ -143,6 +147,9 @@ export default {
         return null
       }
       const formData = new FormData()
+      formData.append('maDanhMuc', this.question.maDanhMuc)
+      formData.append('maCauHoi', this.question.id)
+      formData.append('namApDung', this.namApDung)
       formData.append('file', files)
       await this.$axios.post('auth/file-manager/singleUpload', formData, {
         headers: {
@@ -151,7 +158,8 @@ export default {
       })
           .then((res) => {
             if (res.data.success) {
-              this.fileName = res.data.fileUrl
+              this.fileName.push({'fileUrl': res.data.fileUrl, 'fileName': res.data.fileName})
+              console.log(this.fileName)
             }
           }).catch()
           .finally(() => {

@@ -91,6 +91,7 @@
         <div v-if="fileName != null" class="text-center">
           <v-tooltip top color="primary">
             <template v-slot:activator="{ on, attrs }">
+
               <v-btn
                   color="blue-grey"
                   class="ma-2 white--text"
@@ -135,8 +136,7 @@
         />
       </td>
     </template>
-    <template v-if="question.loaiCauHoi === 2">
-      <td/>
+    <template v-if="question.loaiCauHoi === 3">
       <td class="text-center font-weight-bold">
         ĐTXHH
       </td>
@@ -151,6 +151,10 @@ export default {
   props: {
     question: {
       type: Object,
+      default: null
+    },
+    namApDung:{
+      type: Number,
       default: null
     }
   },
@@ -270,9 +274,8 @@ export default {
         })
       }
     },
-    // eslint-disable-next-line require-await
 
-    async upload(files) {
+    upload(files) {
       this.loading = true
       if (!files) {
         this.loading = false
@@ -280,20 +283,24 @@ export default {
       }
       const formData = new FormData()
       formData.append('file', files)
-      await this.$axios.post('auth/file-manager/singleUpload', formData, {
+      formData.append('maDanhMuc', this.question.maDanhMuc)
+
+      this.$axios.post('auth/file-manager/singleUpload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
+      }).then((res) => {
+        console.log(res.data.data)
       })
-          .then((res) => {
-            if (res.data.success) {
-              this.fileName = res.data.fileUrl
-            }
-          }).catch()
-          .finally(() => {
-            this.capNhatBangDiem()
-            this.loading = false
-          })
+      // .then((res) => {
+      //   if (res.data.success) {
+      //     this.fileName = res.data.fileUrl
+      //   }
+      // }).catch()
+      // .finally(() => {
+      //   this.capNhatBangDiem()
+      //   this.loading = false
+      // })
     },
     clearFile() {
       this.fileName = null
