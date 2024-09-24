@@ -121,6 +121,7 @@ export default {
       default: null
     }
   },
+  emits:['updateFileDanhGia'],
   data() {
     return {
       dialog: false,
@@ -141,7 +142,7 @@ export default {
     bangDiem() {
       if (this.question.danhDauCau === 1) {
         const item = this.bangDiem.find(model => model.maCauHoi === this.question.id)
-        this.fileName = item.fileDanhGia || []
+        this.fileName = JSON.parse(item.fileDanhGia) || []
         this.ghiChuDanhGia = item.ghiChuDanhGia
       }
     },
@@ -173,10 +174,11 @@ export default {
           .then((res) => {
             if (res.data.success) {
               this.fileName.push({'fileUrl': res.data.fileUrl, 'fileName': res.data.fileName})
+              this.capNhatBangDiem()
+              this.$emit('updateFileDanhGia')
             }
           }).catch()
           .finally(() => {
-            this.capNhatBangDiem()
             this.loading = false
           })
     },
@@ -191,12 +193,10 @@ export default {
             this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
             const idx = this.fileName.indexOf(file)
             if (idx > -1) {
-              console.log("xóa vị trí " + idx)
                this.fileName.splice(idx, 1)
-              console.log(this.fileName)
             }
-            console.log('Cập nhật')
             this.capNhatBangDiem()
+            this.$emit('updateFileDanhGia')
           })
     },
     capNhatBangDiem() {
@@ -204,7 +204,7 @@ export default {
       const dataStore = JSON.parse(JSON.stringify(this.bangDiem))
       const idx = dataStore.findIndex(item => item.maCauHoi === this.question.id)
       dataStore[idx].ghiChuDanhGia = this.ghiChuDanhGia
-      dataStore[idx].fileDanhGia = this.fileName
+      dataStore[idx].fileDanhGia = JSON.stringify(this.fileName)
       this.$store.commit('khaoSatStore/capNhatBangDiem', {index: idx, value: dataStore[idx]})
     }
   }

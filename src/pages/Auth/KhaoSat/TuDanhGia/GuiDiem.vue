@@ -12,12 +12,12 @@
             <v-row>
               <v-col cols="12" sm="3">
                 <v-select
-                    v-model="year"
+                    v-model="namApDung"
                     dense
                     label="Năm đánh giá"
-                    item-text="name"
-                    item-value="id"
-                    :items="years"
+                    item-text="text"
+                    item-value="value"
+                    :items="namApDungs"
                 />
               </v-col>
               <v-col cols="12" sm="9">
@@ -96,19 +96,55 @@
                 thủ trưởng đơn vị (có đóng dấu ký tên)
               </v-col>
               <v-col cols="12" sm="12">
-                <v-file-input
-                    dense
-                    hide-details
-                    prepend-icon=""
-                    prepend-inner-icon="mdi-upload"
-                    placeholder="File xác nhận điểm tự đánh giá"
-                    height="20"
-                    style="min-height: auto; max-width: 300px"
-                    clearable
-                    :disabled="disableSubmit"
-                    @change="upload"
-                    @click:clear="clearFile"
-                />
+                <div class="d-flex align-center">
+                  <v-file-input
+                      dense
+                      hide-details
+                      prepend-icon=""
+                      prepend-inner-icon="mdi-upload"
+                      placeholder="File xác nhận điểm tự đánh giá"
+                      height="20"
+                      style="min-height: auto; max-width: 300px"
+                      clearable
+                      @change="upload"
+                      class="me-2"
+                      :disabled="(fileTongHop!=null)"
+                  />
+                  <v-btn
+                      icon
+                      color="red"
+                      @click="clearFile"
+                      v-if="fileTongHop"
+                  >
+                    <v-icon>mdi-refresh</v-icon>
+                  </v-btn>
+                  <v-tooltip v-if="fileTongHop" :text="fileTongHop.fileName">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                          color="blue-grey"
+                          class="ma-2 white--text"
+                          elevation="0"
+                          small
+                          link
+                          target="_blank"
+                          v-bind="attrs"
+                          v-on="on"
+                          :href="download()"
+                      >
+                        <v-icon
+                            dark
+                            left
+                        >
+                          mdi-cloud-download
+                        </v-icon>
+                        <span class="ml-2">
+                  Biên bản
+                </span>
+                      </v-btn>
+
+                    </template>
+                  </v-tooltip>
+                </div>
               </v-col>
             </v-row>
             <v-spacer/>
@@ -192,17 +228,19 @@ export default {
         }
       ],
       dialog: false,
-      category: {},
+      // category: {},
       iData: [],
       loading: false,
       questions: [],
-      year: new Date().getFullYear(),
+      namApDung: 0,
+      namApDungs: [],
       categoryId: 0,
       categories: [],
       isSubmitting: false,
       disableSubmit: true,
       total: 0,
       total1: 0,
+      fileTongHop: null,
       headers: [
         {
           text: 'STT',
@@ -244,22 +282,10 @@ export default {
   },
   computed: {
     ...mapState('khaoSatStore', ['bangDiem']),
-    years() {
-      const year = []
-      const current = (new Date().getFullYear()) + 2
-      for (let i = 2022; i < current; i++) {
-        year.push({
-          id: i,
-          name: `Năm ${i}`
-        })
-      }
-      return year.reverse()
-    }
+
   },
   watch: {
-    year() {
-      this.categoryId = 0
-      this.categories = []
+    namApDung() {
       this.data = []
       this.fnGetDanhMuc()
     },
@@ -276,25 +302,35 @@ export default {
     }
   },
   created() {
-    this.fnGetDanhMuc()
+    this.fnGetNamApDung()
   },
   methods: {
-    async fnGetDanhMuc() {
-      await this.$axios.get('auth/khao-sat/tu-danh-gia/danh-muc', {params: {namApDung: this.year}}).then((res) => {
+    fnGetNamApDung() {
+      this.$axios.get('auth/khao-sat/danh-muc/select-nam-ap-dung').then((res) => {
+        this.namApDungs = res.data.data.map((i) => ({
+          value: i,
+          text: i
+        }))
+        this.namApDung = this.namApDungs[0].value
+      })
+    },
+    fnGetDanhMuc() {
+      this.$axios.get('auth/khao-sat/tu-danh-gia/danh-muc', {params: {namApDung: this.namApDung}}).then((res) => {
         this.categories = (res.data?.data).map(item => ({
           id: item.id,
           name: item.tenDanhMuc
         }))
         this.categoryId = this.categories[0]?.id
-      }).catch()
-      await this.fnGetAvailable()
+      }).catch().finally(() => {
+        this.fnGetAvailable()
+      })
     },
     fnGetCauHoi() {
       this.loading = true
       this.$axios.get('auth/khao-sat/tu-danh-gia/cau-hoi', {
         params: {
           maDanhMuc: this.categoryId,
-          namApDung: this.year
+          namApDung: this.namApDung
         }
       }).then((res) => {
         this.iData = (res.data.data).map(d => khaoSatCauHoiModel.fromJson(d))
@@ -330,19 +366,21 @@ export default {
         this.loading = false
       })
     },
-    async fnGetAvailable() {
-      await this.$axios.post('auth/khao-sat/tu-danh-gia/kiem-tra-hop-le', {maDanhMuc: this.categoryId})
-          .then((res) => {
+    fnGetAvailable() {
+      this.$axios.post('auth/khao-sat/tu-danh-gia/kiem-tra-hop-le', {
+        maDanhMuc: this.categoryId
+      }).then((res) => {
             this.disableSubmit = !res.data.data
             this.$store.commit('khaoSatStore/kiemTraTuDanhGia', this.disableSubmit)
+        this.fileTongHop = JSON.parse(res.data.fileTongHop)
           }).catch()
     },
     fnSubmit() {
-      if (this.fileName != null) {
+      if (this.fileTongHop != null) {
         this.isSubmitting = true
         this.$axios.post('auth/khao-sat/tu-danh-gia/gui-diem', {
           maDanhMuc: this.categoryId,
-          fileName: this.fileName
+          fileName: JSON.stringify(this.fileTongHop)
         })
             .then((res) => {
               this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
@@ -354,7 +392,10 @@ export default {
         this.dialog = true
       }
     },
-    async upload(files) {
+    download() {
+      return process.env.VUE_APP_BASE_URL + 'storage/' + this.fileTongHop.fileUrl
+    },
+    upload(files) {
       this.loading = true
       if (!files) {
         this.loading = false
@@ -362,14 +403,16 @@ export default {
       }
       const formData = new FormData()
       formData.append('file', files)
-      await this.$axios.post('auth/file-manager/singleUpload', formData, {
+      formData.append('namApDung', this.namApDung)
+      this.$axios.post('auth/file-manager/singleUploadTongHop', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
       })
           .then((res) => {
             if (res.data.success) {
-              this.fileName = res.data.fileUrl
+              this.fileTongHop = {fileUrl: res.data.fileUrl, fileName: res.data.fileName}
+              this.fnSubmit()
             }
           }).catch()
           .finally(() => {
@@ -377,7 +420,7 @@ export default {
           })
     },
     clearFile() {
-      this.fileName = null
+      this.fileTongHop = null
     }
   }
 }

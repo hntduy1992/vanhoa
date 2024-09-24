@@ -54,7 +54,7 @@
                 <tbody>
                 <template v-for="(item, idx) in items">
                   <template v-if="item.danhDauCau < 2">
-                    <CauHoi :key="item + idx" :question="item" :nam-ap-dung="namApDung.value"/>
+                    <CauHoi :key="item + idx" :question="item" :nam-ap-dung="namApDung.value" @updateFileDanhGia="fnSubmit"/>
                   </template>
                   <template v-if="item.danhDauCau >= 2">
                     <CauTraLoi :key="item + idx" :question="item"/>
@@ -153,7 +153,6 @@ export default {
       iData: [],
       loading: false,
       questions: [],
-      year: new Date().getFullYear(),
       namApDung: 0,
       namApDungs: [],
       categoryId: 0,
@@ -206,12 +205,6 @@ export default {
     ...mapState('khaoSatStore', ['bangDiem', 'cauHoi']),
   },
   watch: {
-    // year() {
-    //   this.categoryId = 0
-    //   this.categories = []
-    //
-    //   this.fnGetDanhMuc()
-    // },
     namApDung(){
       this.data = []
       this.fnGetDanhMuc()

@@ -18,32 +18,33 @@
     </td>
     <td :rowspan="question.danhDauCau == 1 && question.childrenCount > 0 ? question.childrenCount + 1 : false">
       <template v-if="question.danhDauCau == 1">
-        <div v-if="fileName != null" class="text-center">
-          <v-tooltip top color="primary">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                  color="blue-grey"
-                  class="ma-2 white--text"
-                  elevation="0"
-                  small
-                  link
-                  target="_blank"
-                  v-bind="attrs"
-                  v-on="on"
-                  :href="download()"
-              >
-                <v-icon
-                    dark
-                    left
-                >
-                  mdi-cloud-download
-                </v-icon>
-                <span class="ml-2">Tải về</span>
-              </v-btn>
-            </template>
-            <span>{{ fileName.split('/').pop() }}</span>
-          </v-tooltip>
-        </div>
+          <v-list v-if="fileName != null" class="text-center">
+            <v-list-item v-for="(file,index) of fileName" :key="index">
+              <v-tooltip  top color="primary">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                      color="blue-grey"
+                      class="ma-2 white--text"
+                      elevation="0"
+                      small
+                      link
+                      target="_blank"
+                      v-bind="attrs"
+                      v-on="on"
+                      :href="download(file.fileUrl)"
+                  >
+                    <v-icon
+                        dark
+                        left
+                    >
+                      mdi-cloud-download
+                    </v-icon>
+                    <span class="ml-2">{{ file.fileName }}</span>
+                  </v-btn>
+                </template>
+              </v-tooltip>
+            </v-list-item>
+          </v-list>
       </template>
     </td>
     <td
@@ -80,7 +81,7 @@ export default {
       dialog: false,
       loading: false,
       score: 0,
-      fileName: null,
+      fileName: [],
       ghiChuDanhGia: null
     }
   },
@@ -94,19 +95,27 @@ export default {
     bangDiem() {
       if (this.question.danhDauCau === 1) {
         const item = this.bangDiem.find(model => model.maCauHoi === this.question.id)
-        this.fileName = item.fileDanhGia
+        this.fileName = JSON.parse(item.fileDanhGia) || []
         this.ghiChuDanhGia = item.ghiChuDanhGia
       }
     }
   },
   methods: {
-    download() {
-      return process.env.VUE_APP_BASE_URL + 'storage/' + this.fileName
+    download(fileUrl) {
+      return process.env.VUE_APP_BASE_URL + 'storage/' + fileUrl
     }
   }
 }
 </script>
 
 <style scoped>
-
+.v-list{
+  background: transparent;
+}
+.v-list-item{
+  display: block;
+}
+.v-list-item a{
+  margin: 0 !important;
+}
 </style>
