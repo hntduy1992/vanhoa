@@ -16,9 +16,21 @@
           :class="{ 'font-weight-bold': question.level == 0, 'red--text': question.level === 0}"
       >{{ parseFloat(diemTuDanhGia).toFixed(2) }}</span>
     </td>
-    <td :rowspan="question.danhDauCau == 1 && question.childrenCount > 0 ? question.childrenCount + 1 : false">
+    <td :rowspan="question.danhDauCau == 1 && question.childrenCount > 0 ? question.childrenCount + 1 : false"
+        class="text-center">
       <template v-if="question.danhDauCau == 1">
+        <label class="v-btn blue-grey pa-2 text--white"
+               :for="'uploadFile_' + question.id">
+          Minh chứng
+          <v-icon
+              right
+              dark
+          >
+            mdi-cloud-upload
+          </v-icon>
+        </label>
         <v-file-input
+            :id="'uploadFile_' + question.id"
             dense
             hide-details
             prepend-icon=""
@@ -28,8 +40,8 @@
             style="min-height: auto"
             clearable
             @change="upload"
-            @click:clear="clearFile"
             :disabled="disableTuDanhGia"
+            hide-input
         />
         <div class="mt-0">
           <v-progress-linear
@@ -38,40 +50,42 @@
               color="indigo"
           />
         </div>
-        <div v-if="fileName != null" class="text-center">
-          <v-tooltip top color="primary">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                  color="blue-grey"
-                  class="ma-2 white--text"
-                  elevation="0"
-                  small
-                  link
-                  target="_blank"
-                  v-bind="attrs"
-                  v-on="on"
-                  :href="download()"
-              >
-                <v-icon
-                    dark
-                    left
+        <v-list v-if="fileName != null" class="text-center">
+          <v-list-item v-for="(file,index) of fileName" :key="index">
+            <v-tooltip  top color="primary">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    color="blue-grey"
+                    class="ma-2 white--text"
+                    elevation="0"
+                    small
+                    link
+                    target="_blank"
+                    v-bind="attrs"
+                    v-on="on"
+                    :href="download(file.fileUrl)"
                 >
-                  mdi-cloud-download
-                </v-icon>
-                <span class="ml-2">Tải về</span>
-              </v-btn>
-            </template>
-            <span>{{ fileName.split('/').pop() }}</span>
-          </v-tooltip>
-          <v-btn
-              v-if="!disableTuDanhGia"
-              icon
-              color="red"
-              @click="clearFile()"
-          >
-            <v-icon>mdi-delete-circle-outline</v-icon>
-          </v-btn>
-        </div>
+                  <v-icon
+                      dark
+                      left
+                  >
+                    mdi-cloud-download
+                  </v-icon>
+                  <span class="ml-2">{{ file.fileName }}</span>
+                </v-btn>
+                <v-btn
+                    icon
+                    color="red"
+                    @click="clearFile(file)"
+                >
+                  <v-icon>mdi-delete-circle-outline</v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
+          </v-list-item>
+
+
+        </v-list>
       </template>
     </td>
     <td
@@ -101,14 +115,19 @@ export default {
     question: {
       type: Object,
       default: null
+    },
+    namApDung: {
+      type: Number,
+      default: null
     }
   },
+  emits:['updateFileDanhGia'],
   data() {
     return {
       dialog: false,
       loading: false,
       score: 0,
-      fileName: null,
+      fileName: [],
       ghiChuDanhGia: null
     }
   },
@@ -123,7 +142,7 @@ export default {
     bangDiem() {
       if (this.question.danhDauCau === 1) {
         const item = this.bangDiem.find(model => model.maCauHoi === this.question.id)
-        this.fileName = item.fileDanhGia
+        this.fileName = JSON.parse(item.fileDanhGia) || []
         this.ghiChuDanhGia = item.ghiChuDanhGia
       }
     },
@@ -132,43 +151,60 @@ export default {
     }
   },
   methods: {
-    download() {
-      return process.env.VUE_APP_BASE_URL + 'storage/' + this.fileName
+    download(fileUrl) {
+      return process.env.VUE_APP_BASE_URL + 'storage/' + fileUrl
     },
 
-    async upload(files) {
+    upload(files) {
       this.loading = true
       if (!files) {
         this.loading = false
         return null
       }
       const formData = new FormData()
+      formData.append('maDanhMuc', this.question.maDanhMuc)
+      formData.append('maCauHoi', this.question.id)
+      formData.append('namApDung', this.namApDung)
       formData.append('file', files)
-      await this.$axios.post('auth/file-manager/singleUpload', formData, {
+      this.$axios.post('auth/file-manager/singleUpload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
       })
           .then((res) => {
             if (res.data.success) {
-              this.fileName = res.data.fileUrl
+              this.fileName.push({'fileUrl': res.data.fileUrl, 'fileName': res.data.fileName})
+              this.capNhatBangDiem()
+              this.$emit('updateFileDanhGia')
             }
           }).catch()
           .finally(() => {
-            this.capNhatBangDiem()
             this.loading = false
           })
     },
-    clearFile() {
-      this.fileName = null
-      this.capNhatBangDiem()
+
+    clearFile(file) {
+      this.$axios.delete('auth/file-manager/singleRemove', {
+        params: {
+          fileUrl: file.fileUrl
+        }
+      })
+          .then((res) => {
+            this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
+            const idx = this.fileName.indexOf(file)
+            if (idx > -1) {
+               this.fileName.splice(idx, 1)
+            }
+            this.capNhatBangDiem()
+            this.$emit('updateFileDanhGia')
+          })
     },
     capNhatBangDiem() {
       this.dialog = false
       const dataStore = JSON.parse(JSON.stringify(this.bangDiem))
       const idx = dataStore.findIndex(item => item.maCauHoi === this.question.id)
       dataStore[idx].ghiChuDanhGia = this.ghiChuDanhGia
-      dataStore[idx].fileDanhGia = this.fileName
+      dataStore[idx].fileDanhGia = JSON.stringify(this.fileName)
       this.$store.commit('khaoSatStore/capNhatBangDiem', {index: idx, value: dataStore[idx]})
     }
   }
@@ -176,5 +212,10 @@ export default {
 </script>
 
 <style scoped>
-
+.v-list{
+  background: transparent;
+}
+.v-list-item{
+  display: block;
+}
 </style>
