@@ -423,7 +423,7 @@ export default {
 
     },
     download(fileName) {
-      return process.env.VUE_APP_BASE_URL + 'storage/' + fileName
+      return process.env.VUE_APP_BASE_URL + 'storage/' + fileName.fileUrl
     },
     openDialog(donVi) {
       this.dialog = true;
