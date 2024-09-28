@@ -81,10 +81,9 @@
                   <v-icon>mdi-delete-circle-outline</v-icon>
                 </v-btn>
               </template>
+              <span></span>
             </v-tooltip>
           </v-list-item>
-
-
         </v-list>
       </template>
     </td>

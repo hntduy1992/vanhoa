@@ -37,6 +37,7 @@
         </v-card>
       </v-col>
       <v-col cols="12">
+        <h3 class="text-uppercase text-center">{{ donViDanhGia }}</h3>
         <v-card>
           <v-card-text>
             <table
@@ -49,10 +50,9 @@
                 <th>Tiêu chí</th>
                 <th>Điểm lớn nhất</th>
                 <th>Tự đánh giá</th>
-                <th>Đính kèm</th>
                 <th>Ghi chú tự đánh giá</th>
                 <th>Thẩm định</th>
-                <th>Ghi chú thẩm định</th>
+                <th style="width: 15vw">Ghi chú thẩm định</th>
                 <th v-if="$route.query.thamDinhLai == 1">Ý kiến đơn vị</th>
               </tr>
               </thead>
@@ -159,6 +159,7 @@ export default {
           href: '/Auth/KhaoSat/ThamDinh/GuiDiem'
         }
       ],
+      donViDanhGia: null,
       category: {},
       iData: [],
       loading: false,
@@ -213,14 +214,17 @@ export default {
       this.total2 = total2
     }
   },
-  async created() {
+  created() {
     this.categoryId = this.$route.query.categoryId
-    await this.fnGetDanhMuc()
-    await this.fnGetAvailable()
+    this.fnGetDanhMuc()
+    this.fnGetAvailable()
+    this.$axios.get(`auth/don-vi/id/${this.$route.params.orgId}`).then(res => {
+      this.donViDanhGia = res.data.data.tenDonVi
+    })
   },
   methods: {
-    async fnGetDanhMuc() {
-      await this.$axios.get('auth/khao-sat/tham-dinh/danh-muc', {params: {namApDung: this.year}}).then((res) => {
+    fnGetDanhMuc() {
+      this.$axios.get('auth/khao-sat/tham-dinh/danh-muc', {params: {namApDung: this.year}}).then((res) => {
         this.categories = (res.data?.data).map(item => ({
           id: item.id,
           name: item.tenDanhMuc
@@ -269,8 +273,8 @@ export default {
         }, 1)
       }).catch()
     },
-    async fnGetAvailable() {
-      await this.$axios.post('auth/khao-sat/tham-dinh/kiem-tra-hop-le', {
+    fnGetAvailable() {
+      this.$axios.post('auth/khao-sat/tham-dinh/kiem-tra-hop-le', {
         maDanhMuc: this.categoryId,
         maDonVi: this.$route.params.orgId
       })

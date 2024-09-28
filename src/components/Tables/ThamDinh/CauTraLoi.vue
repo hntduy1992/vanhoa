@@ -10,7 +10,7 @@
       <td class="text-center">
         {{ question.diemLonNhat.toFixed(2) }}
       </td>
-      <td class="text-center">
+      <td class="text-center" >
         <template v-if="question.loaiCauHoi === 1">
           <v-text-field
               v-if="question.kieuNhapLieu === 'Text'"
@@ -63,7 +63,7 @@
           </v-radio-group>
         </template>
       </td>
-      <td>
+      <td class="text-center px-2"  >
         <template v-if="!dontHavePermission">
           <v-text-field
               v-if="question.kieuNhapLieu === 'Text'"
@@ -129,7 +129,7 @@
         {{ question.tenCauHoi }}
       </td>
       <td/>
-      <td class="text-center">
+      <td class="text-center"  >
         <template v-if="question.loaiCauHoi === 1 && question.danhDauCau === 3">
           <v-text-field
               v-if="question.kieuNhapLieu === 'Text'"
@@ -187,7 +187,7 @@
       </td>
       <td/>
       <td/>
-      <td>
+      <td >
         <template v-if="!dontHavePermission">
           <v-text-field
               v-if="question.kieuNhapLieu === 'Text'"
@@ -312,20 +312,25 @@ export default {
     ...mapState('khaoSatStore', ['disableThamDinh', 'permissions']),
     points() {
       const rPoints = []
-      let counter = JSON.parse(JSON.stringify(this.question.diemNhoNhat));
-      while (Number(counter.toFixed(2)) <= this.question.diemLonNhat) {
+      let counter = JSON.parse(JSON.stringify(this.question.diemLonNhat));
+      // select giam
+      do
+      {
         rPoints.push({
           id: Number(counter.toFixed(2)),
           name: counter.toFixed(2)
         })
-        counter += this.question.buocNhay
+        counter -= this.question.buocNhay
       }
-      /*for (let i = JSON.parse(JSON.stringify(this.question.diemNhoNhat)); i <= this.question.diemLonNhat; i += this.question.buocNhay) {
-          rPoints.push({
-              id: Number(i.toFixed(2)),
-              name: i.toFixed(2)
-          })
-      }*/
+      while (Number(counter.toFixed(2)) >= (this.question.diemNhoNhat && 0));
+      //
+      // while (Number(counter.toFixed(2)) <= this.question.diemLonNhat) {
+      //   rPoints.push({
+      //     id: Number(counter.toFixed(2)),
+      //     name: counter.toFixed(2)
+      //   })
+      //   counter += this.question.buocNhay
+      // }
       return rPoints
     },
     parent() {
@@ -443,8 +448,6 @@ export default {
     if (this.$route.query.thamDinhLai == 1) {
       this.ghiChuYKien = this.question?.ykien?.noiDung
     }
-    console.log(this.permissions);
-    
   }
 }
 </script>
