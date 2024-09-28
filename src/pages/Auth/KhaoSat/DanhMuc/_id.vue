@@ -40,6 +40,19 @@
                       rows="3"
                   />
                 </v-col>
+                <v-col cols="12" sm="12" md="12">
+                  <v-select
+                      v-model="item.phanLoai"
+                      dense
+                      outlined
+                      label="Phân loại"
+                      item-text="name"
+                      item-value="id"
+                      :items="[{ id: 1, name: 'Xã, Phường'},{ id: 2, name: 'Khóm, Ấp'} ]"
+                      :return-object="false"
+                      @change="fnGetOrg"
+                  />
+                </v-col>
               </v-row>
             </v-card-text>
           </v-card>
@@ -96,9 +109,9 @@
 </template>
 
 <script>
-import { ValidationObserver } from 'vee-validate'
+import {ValidationObserver} from 'vee-validate'
 import VTextValidation from '@/components/Validations/VTextValidation'
-import { khaoSatDanhMucModel } from '@/models/khaoSatDanhMucModel'
+import {khaoSatDanhMucModel} from '@/models/khaoSatDanhMucModel'
 import LayoutDefault from "@/layouts/default";
 import IBreadcrumb from "@/components/IBreadcrumb";
 
@@ -137,30 +150,34 @@ export default {
         children: []
       }],
       search: null,
-      organizationId: null
+      organizationId: null,
     }
   },
   created() {
   },
   methods: {
-    async fnGetOrg() {
-      await this.$axios.get('auth/don-vi/select').then((res) => {
+    fnGetOrg() {
+      this.$axios.get('auth/don-vi/select', {
+        params: {
+          phanLoai: this.item.phanLoai
+        }
+      }).then((res) => {
         this.organizations = (res.data.data).map(item => ({
           id: item.id,
           name: item.tenDonVi
         }))
         this.items[0].children = this.organizations
       }).catch()
-      await this.fnGetDetail()
+      this.fnGetDetail()
     },
-    async fnGetDetail() {
-      await this.$axios.get('auth/khao-sat/danh-muc/id/' + this.$route.params.id).then((res) => {
+    fnGetDetail() {
+      this.$axios.get('auth/khao-sat/danh-muc/id/' + this.$route.params.id).then((res) => {
         this.item = khaoSatDanhMucModel.fromJson(res.data.data)
       }).catch()
     },
-    async fnSubmit() {
+    fnSubmit() {
       this.loading = true
-      const valid = await this.$refs.observer.validate()
+      const valid = this.$refs.observer.validate()
       if (!valid) {
         this.loading = false
         return false
@@ -172,8 +189,8 @@ export default {
         this.loading = false
       })
     },
-    async fnReset() {
-      await this.fnGetDetail()
+    fnReset() {
+      this.fnGetDetail()
     }
   }
 }

@@ -12,12 +12,12 @@
             <v-row>
               <v-col cols="12" sm="3">
                 <v-select
-                    v-model="year"
+                    v-model="namApDung"
                     dense
                     label="Năm đánh giá"
-                    item-text="name"
-                    item-value="id"
-                    :items="years"
+                    item-text="text"
+                    item-value="value"
+                    :items="namApDungs"
                 />
               </v-col>
               <v-col cols="12" sm="9">
@@ -29,6 +29,7 @@
                     item-value="id"
                     :items="categories"
                 />
+
               </v-col>
             </v-row>
           </v-card-text>
@@ -37,6 +38,75 @@
       <v-col cols="12">
         <v-card>
           <v-card-text>
+            <div class="d-flex justify-center mb-2">
+
+              <v-chip
+                  class="ma-2"
+                  color="red"
+                  text-color="white"
+              >
+                <v-avatar
+                    left
+                    class="red darken-4"
+                >
+                  {{ data.filter(x => x.trangThaiHienTai < 2).length }}
+                </v-avatar>
+                Chưa gởi đánh giá
+              </v-chip>
+              <v-chip
+                  class="ma-2"
+                  color="warning"
+                  text-color="white"
+              >
+                <v-avatar
+                    left
+                    class="warning darken-4"
+                >
+                  {{ data.filter(x => x.trangThaiHienTai === 2 || x.trangThaiHienTai === 6).length }}
+                </v-avatar>
+                Thẩm định
+              </v-chip>
+              <v-chip
+                  class="ma-2"
+                  color="primary"
+                  text-color="white"
+              >
+                <v-avatar
+                    left
+                    class="primary darken-4"
+                >
+                  {{ data.filter(x => x.trangThaiHienTai === 3 || x.trangThaiHienTai === 7).length }}
+                </v-avatar>
+                Đã thẩm định & Chờ duyệt
+              </v-chip>
+              <v-chip
+                  class="ma-2"
+                  color="success"
+                  text-color="white"
+              >
+                <v-avatar
+                    left
+                    class="success darken-4"
+                >
+                  {{ data.filter(x => x.trangThaiHienTai >= 4 && x.trangThaiHienTai < 7).length }}
+                </v-avatar>
+                Đã duyệt
+              </v-chip>
+              <v-chip
+                  class="ma-2"
+                  color="info"
+                  text-color="white"
+              >
+                <v-avatar
+                    left
+                    class="info darken-4"
+                >
+                  {{ data.filter(x => x.trangThaiHienTai === 8).length }}
+                </v-avatar>
+                Hoàn thành
+              </v-chip>
+
+            </div>
             <v-data-table
                 id="survey"
                 dense
@@ -72,7 +142,8 @@
                 >
                   Thẩm định
                 </v-btn>
-                <v-btn v-else-if="value === 3 || value == 7" small outlined color="primary" :to="`ThamDinh/${item.id}/GuiDiem?categoryId=${categoryId}`">
+                <v-btn v-else-if="value === 3 || value === 7" small outlined color="primary"
+                       :to="`ThamDinh/${item.id}/GuiDiem?categoryId=${categoryId}`">
                   Đã thẩm định & Chờ duyệt
                 </v-btn>
                 <v-btn v-else-if="value >= 4 && value < 7" small outlined color="success" :to="`ThamDinh/${item.id}/GuiDiem?categoryId=${categoryId}`">
@@ -99,6 +170,7 @@
 
 import LayoutDefault from "@/layouts/default";
 import IBreadcrumb from "@/components/IBreadcrumb";
+
 export default {
   name: 'ThamDinh',
   inject: ['siteNameTemplate'],
@@ -136,7 +208,8 @@ export default {
       data: [],
       loading: false,
       questions: [],
-      year: new Date().getFullYear(),
+      namApDung: 0,
+      namApDungs: [],
       categoryId: 0,
       categories: [],
       isSubmitting: false,
@@ -175,22 +248,8 @@ export default {
       ]
     }
   },
-  computed: {
-    years() {
-      const year = []
-      const current = (new Date().getFullYear()) + 2
-      for (let i = current; i < current; i++) {
-        year.push({
-          id: i,
-          name: `Năm ${i}`
-        })
-      }
-      return year.reverse()
-    }
-  },
   watch: {
-    year() {
-      this.categoryId = 0
+    namApDung() {
       this.data = []
       this.fnGetDanhMuc()
     },
@@ -200,14 +259,20 @@ export default {
     }
   },
   created() {
-    this.fnGetDanhMuc()
-    if (this.categoryId === 0) {
-      this.disableSubmit = false
-    }
+    this.fnGetNamApDung()
   },
   methods: {
-    async fnGetDanhMuc() {
-      await this.$axios.get('auth/khao-sat/tham-dinh/danh-muc', { params: { namApDung: this.year } }).then((res) => {
+    fnGetNamApDung() {
+      this.$axios.get('auth/khao-sat/danh-muc/select-nam-ap-dung').then((res) => {
+        this.namApDungs = res.data.data.map((i) => ({
+          value: i,
+          text: i
+        }))
+        this.namApDung = this.namApDungs[0]
+      })
+    },
+    fnGetDanhMuc() {
+      this.$axios.get('auth/khao-sat/tham-dinh/danh-muc', {params: {namApDung: this.namApDung.value}}).then((res) => {
         this.categories = (res.data?.data).map(item => ({
           id: item.id,
           name: item.tenDanhMuc
@@ -215,11 +280,11 @@ export default {
         this.categoryId = this.categories[0]?.id
       }).catch()
     },
-    async fnDonViDanhGia() {
+    fnDonViDanhGia() {
       this.loading = true
-      await this.$axios.get('auth/khao-sat/tham-dinh/don-vi', {
+      this.$axios.get('auth/khao-sat/tham-dinh/don-vi', {
         params: {
-          year: this.year,
+          namApDung: this.namApDung.value,
           categoryId: this.categoryId
         }
       })

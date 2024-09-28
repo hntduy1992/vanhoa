@@ -5,7 +5,8 @@ const toJson = (item) => {
     noiDung: item.noiDung,
     namApDung: item.namApDung,
     donViApDung: item.donViApDung,
-    trangThai: item.trangThai
+    trangThai: item.trangThai,
+    phanLoai: item.phanLoai
   }
 }
 
@@ -16,7 +17,8 @@ const fromJson = (item) => {
     noiDung: item.noiDung,
     namApDung: item.namApDung,
     donViApDung: (item?.donvi) ? item.donvi.map(item => item.maDonVi) : [],
-    trangThai: item.trangThai
+    trangThai: item.trangThai,
+    phanLoai: item.phanLoai
   }
 }
 
@@ -27,7 +29,8 @@ const baseJson = () => {
     noiDung: null,
     namApDung: null,
     donViApDung: [],
-    trangThai: 1
+    trangThai: 1,
+    phanLoai: null
   }
 }
 
