@@ -19,50 +19,40 @@
         <td :rowspan="question.danhDauCau === 1 && question.childrenCount > 0 ? question.childrenCount + 1 : false"
             class="w-cell-100">
             <template v-if="question.danhDauCau === 1">
-                <div v-if="fileName != null" class="text-center">
-                    <v-tooltip top color="primary">
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                                color="blue-grey"
-                                class="ma-2 white--text"
-                                elevation="0"
-                                small
-                                link
-                                target="_blank"
-                                v-bind="attrs"
-                                v-on="on"
-                                :href="download()"
-                            >
-                                <v-icon
-                                    dark
-                                    left
-                                >
-                                    mdi-cloud-download
-                                </v-icon>
-                                <span class="ml-2">Tải về</span>
-                            </v-btn>
-                        </template>
-                        <span>{{ fileName.split('/').pop() }}</span>
-                    </v-tooltip>
-                </div>
-            </template>
-        </td>
-        <td
-            class="text-center"
-            :rowspan="question.danhDauCau === 1 && question.childrenCount > 0 ? question.childrenCount + 1 : false"
-        >
-            <div v-if="question.danhDauCau === 1 && ghiChuDanhGia != null">
+              <template v-if="fileName">
+                <v-btn
+                    v-for="(file,index) of fileName" :key="index"
+                    color="blue-grey"
+                    class="ma-2 white--text"
+                    elevation="0"
+                    small
+                    link
+                    target="_blank"
+                    :href="download(file.fileUrl)"
+                >
+                  <v-icon
+                      dark
+                      left
+                  >
+                    mdi-cloud-download
+                  </v-icon>
+                  <span>{{ file.fileName }}</span>
+                </v-btn>
+              </template>
+              <template v-if="question.danhDauCau === 1 && ghiChuDanhGia != null">
                 <v-textarea
                     v-model="ghiChuDanhGia"
                     label="Nội dung"
                     dense
                     outlined
                     hide-details
-                    rows="2"
                     class="mt-2"
                     :readonly="true"
+                    style="height: 100%"
+                    no-resize
                 />
-            </div>
+              </template>
+            </template>
         </td>
         <td class="text-center">
       <span
@@ -76,14 +66,15 @@
             <template v-if="question.danhDauCau === 1  && (!dontHavePermission || question.donViThamDinh === this.auth.user.organizationId)">
                 <div v-if="!question.hasChild">
                     <v-textarea
-                        v-model="ghiChuThamDinh"
+                        v-model="ghiChuDanhGia"
                         label="Nội dung"
                         dense
                         outlined
                         hide-details
                         class="mt-2"
-                        rows="2"
                         :readonly="true"
+                        style="height: 100%"
+                        no-resize
                     />
                 </div>
             </template>
@@ -95,17 +86,18 @@
         >
             <template v-if="question.danhDauCau === 1 && !dontHavePermission">
                 <div v-if="!question.hasChild" style="width: 150px">
-                    <v-textarea
-                        v-if="ghiChuYKien != null"
-                        v-model="ghiChuYKien"
-                        label="Nội dung"
-                        dense
-                        outlined
-                        hide-details
-                        class="mt-2"
-                        rows="2"
-                        :readonly="true"
-                    />
+                  <v-textarea
+                      v-if="ghiChuYKien != null"
+                      v-model="ghiChuYKien"
+                      label="Nội dung"
+                      dense
+                      outlined
+                      hide-details
+                      class="mt-2"
+                      :readonly="true"
+                      style="height: 100%"
+                      no-resize
+                  />
                     <span v-else>Thống nhất</span>
                 </div>
             </template>
@@ -129,7 +121,7 @@ export default {
             dialog2: false,
             loading: false,
             score: 0,
-            fileName: null,
+            fileName: [],
             ghiChuDanhGia: null,
             ghiChuThamDinh: null,
             dontHavePermission: true,
@@ -152,7 +144,7 @@ export default {
         bangDiem() {
             if (this.question.danhDauCau === 1) {
                 const item = this.bangDiem.find(model => model.maCauHoi === this.question.id)
-                this.fileName = item.fileDanhGia
+              this.fileName = JSON.parse(item.fileDanhGia) || []
                 this.ghiChuDanhGia = item.ghiChuDanhGia
                 this.ghiChuThamDinh = item.ghiChuThamDinh
             }

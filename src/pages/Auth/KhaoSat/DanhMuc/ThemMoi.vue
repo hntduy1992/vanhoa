@@ -40,6 +40,18 @@
                       rows="3"
                   />
                 </v-col>
+                <v-col cols="12" sm="12" md="12">
+                  <v-select
+                      v-model="item.phanLoai"
+                      dense
+                      outlined
+                      label="Phân loại"
+                      item-text="name"
+                      item-value="id"
+                      :items="[ { id: 1, name: 'Xã, Phường'},{ id: 2, name: 'Khóm, Ấp'} ]"
+                      :return-object="false"
+                  />
+                </v-col>
               </v-row>
             </v-card-text>
           </v-card>

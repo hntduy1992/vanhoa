@@ -2,12 +2,12 @@
   <LayoutDefault>
     <v-row>
       <v-col cols="12">
-        <IBreadcrumb :items="breadcrumbs" />
+        <IBreadcrumb :items="breadcrumbs"/>
       </v-col>
       <v-col cols="12">
         <v-card>
           <v-card-subtitle>LỌC BỘ TIÊU CHÍ ĐÁNH GIÁ</v-card-subtitle>
-          <v-divider />
+          <v-divider/>
           <v-card-text>
             <v-row>
               <v-col cols="12" sm="3">
@@ -68,7 +68,7 @@
                         <v-autocomplete
                             v-model="item.donvithamdinh.maDonVi"
                             dense
-                            label="Đơn vị"
+                            label="Chọn đơn vị"
                             hide-details
                             style="width: 310px"
                             item-value="id"
@@ -78,11 +78,6 @@
                             :return-object="false"
                             @change="fnChange(item.id, item.donvithamdinh.maDonVi)"
                         />
-                      </template>
-                    </td>
-                    <td class="text-center">
-                      <template v-if="item.loaiCauHoi === 2">
-                        <span class="font-weight-bold">ĐTXHH</span>
                       </template>
                     </td>
                   </tr>
@@ -98,9 +93,9 @@
               </template>
             </v-data-table>
           </v-card-text>
-          <v-divider />
+          <v-divider/>
           <v-card-actions>
-            <v-spacer />
+            <v-spacer/>
             <v-btn
                 width="100"
                 color="error"
@@ -120,6 +115,7 @@
 
 import LayoutDefault from "@/layouts/default";
 import IBreadcrumb from "@/components/IBreadcrumb";
+
 export default {
   components: {LayoutDefault, IBreadcrumb},
   data() {
@@ -149,25 +145,19 @@ export default {
         {
           text: 'Tiêu chí',
           value: 'name',
-          width: 560
+          width: '100%'
         },
         {
           text: 'Điểm tối đa',
           value: 'maxScore',
           align: 'center',
-          width: 146
+          width: 100
         },
         {
           text: 'Đơn vị thẩm định',
           value: 'organization',
           align: 'center',
-          width: 210
-        },
-        {
-          text: 'Ghi chú',
-          value: 'action',
-          align: 'center',
-          width: 100
+          width: 200
         }
       ],
       organizations: [],
@@ -209,7 +199,11 @@ export default {
   },
   methods: {
     async fnGetOrg() {
-      await this.$axios.get('auth/don-vi/select').then((res) => {
+      await this.$axios.get('auth/don-vi/select', {
+        params:{
+          'phanLoai': 0
+        }
+      }).then((res) => {
         this.organizations = (res.data.data).map(item => ({
           id: item.id,
           name: item.tenDonVi
@@ -228,9 +222,9 @@ export default {
         }))
         this.categoryId = this.categories[0]?.id ?? 0
       }).catch()
-        .finally(() => {
-          this.loading = false
-        })
+          .finally(() => {
+            this.loading = false
+          })
     },
     async fnGetQuestions() {
       this.loading = true
@@ -240,25 +234,25 @@ export default {
           categoryId: this.categoryId
         }
       })
-        .then((res) => {
-          this.data = (res.data.data).map((item) => {
-            if (item.donvithamdinh) {
-              this.assigned.push(item.donvithamdinh)
-            }
-            return {
-              id: item.id,
-              stt: item.stt,
-              tenCauHoi: item.tenCauHoi,
-              diemLonNhat: item.diemLonNhat,
-              danhDauCau: item.danhDauCau,
-              loaiCauHoi: item.loaiCauHoi,
-              donvithamdinh: item.donvithamdinh ?? {}
-            }
+          .then((res) => {
+            this.data = (res.data.data).map((item) => {
+              if (item.donvithamdinh) {
+                this.assigned.push(item.donvithamdinh)
+              }
+              return {
+                id: item.id,
+                stt: item.stt,
+                tenCauHoi: item.tenCauHoi,
+                diemLonNhat: item.diemLonNhat,
+                danhDauCau: item.danhDauCau,
+                loaiCauHoi: item.loaiCauHoi,
+                donvithamdinh: item.donvithamdinh ?? {}
+              }
+            })
           })
-        })
-        .finally(() => {
-          this.loading = false
-        })
+          .finally(() => {
+            this.loading = false
+          })
     },
     fnChange(maCauHoi, maDonVi) {
       const item = this.assigned.find(item => item.maCauHoi === maCauHoi)
