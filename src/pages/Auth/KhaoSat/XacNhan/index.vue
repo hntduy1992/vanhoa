@@ -77,7 +77,7 @@
                       <span class="ml-2">Tải về</span>
                     </v-btn>
                   </template>
-                  <span>{{ value.split('/').pop() }}</span>
+                  <span>{{ value.filename}}</span>
                 </v-tooltip>
 
               </template>
@@ -400,7 +400,6 @@ export default {
           tenDonVi: item.tenDonVi,
           trangThai: item.trangThai
         }))
-        console.log('---------', this.desserts)
         //this.categoryId = this.categories[0]?.id
       }).catch()
     },
@@ -414,6 +413,7 @@ export default {
       })
           .then((res) => {
             this.data = res.data.data
+            console.log(this.data)
           })
           .finally(() => {
             this.loading = false
@@ -422,8 +422,8 @@ export default {
     async fnSubmit() {
 
     },
-    download(fileName) {
-      return process.env.VUE_APP_BASE_URL + 'storage/' + fileName.fileUrl
+    download(file) {
+      return process.env.VUE_APP_BASE_URL + 'storage/' + file.fileUrl
     },
     openDialog(donVi) {
       this.dialog = true;

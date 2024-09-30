@@ -49,7 +49,6 @@
                 <th>Tiêu chí</th>
                 <th>Điểm lớn nhất</th>
                 <th>Tự đánh giá</th>
-                <th>Đính kèm</th>
                 <th>Ghi chú tự đánh giá</th>
                 <th>Thẩm định</th>
                 <th>Ghi chú thẩm định</th>
@@ -218,13 +217,13 @@ export default {
   },
   methods: {
     async fnExportToWord() {
-      await this.$axios.post('auth/file-manager/export-to-word', {
+      await this.$axios.post('auth/file-manager/export-to-word/xac-nhan', {
         bangDiem: this.bangDiem,
         cauHoi: this.cauHoi,
         danhMuc: this.categoryId,
-        donVi: this.$route.params.orgId
+        maDonVi: this.$route.params.orgId
       }).then((res) => {
-        window.location.href = process.env.VUE_APP_BASE_URL + 'storage/files/BienBan/' + res.data.file
+        window.location.href = process.env.VUE_APP_BASE_URL + 'storage/XacNhan/' + res.data.file
       })
     },
     async fnGetDanhMuc() {
