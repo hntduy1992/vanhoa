@@ -95,10 +95,10 @@
           </v-card-text>
           <v-divider/>
           <v-card-actions>
-            <v-btn @click="fnExportToWord" color="blue" dark small>
-              <v-icon>mdi-file-export</v-icon>
-              Xuất file
-            </v-btn>
+<!--            <v-btn @click="fnExportToWord" color="blue" dark small>-->
+<!--              <v-icon>mdi-file-export</v-icon>-->
+<!--              Xuất file-->
+<!--            </v-btn>-->
             <v-spacer/>
             <v-btn
                 color="primary"

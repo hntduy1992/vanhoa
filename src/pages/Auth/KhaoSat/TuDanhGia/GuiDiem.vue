@@ -151,7 +151,7 @@
             <v-btn
                 color="error"
                 :loading="isSubmitting"
-                :disabled="disableSubmit"
+                :disabled="disableSubmit && trangThaiHienTai>3"
                 @click.stop="fnSubmit"
             >
               Gửi điểm
@@ -241,6 +241,7 @@ export default {
       total: 0,
       total1: 0,
       fileTongHop: null,
+      trangThaiHienTai: null,
       headers: [
         {
           text: 'STT',
@@ -251,30 +252,29 @@ export default {
         {
           text: 'Tiêu chí',
           value: 'name',
-          width: 260
         },
         {
           text: 'Điểm tối đa',
           value: 'maxScore',
-          width: 55,
+          width: '10%',
           align: 'center'
         },
         {
           text: 'Tự đánh giá',
           value: 'year',
-          width: 75,
+          width: '10%',
           align: 'center'
         },
         {
           text: 'Đính kèm',
           value: 'year',
-          width: 80,
+          width: '20%',
           align: 'center'
         },
         {
           text: 'Ghi chú',
           value: 'year',
-          width: 80,
+          width: '20%',
           align: 'center'
         }
       ]
@@ -370,10 +370,11 @@ export default {
       this.$axios.post('auth/khao-sat/tu-danh-gia/kiem-tra-hop-le', {
         maDanhMuc: this.categoryId
       }).then((res) => {
-            this.disableSubmit = !res.data.data
-            this.$store.commit('khaoSatStore/kiemTraTuDanhGia', this.disableSubmit)
+        this.disableSubmit = !res.data.data
+        this.trangThaiHienTai = res.data.trangThai
+        this.$store.commit('khaoSatStore/kiemTraTuDanhGia', this.disableSubmit)
         this.fileTongHop = JSON.parse(res.data.fileTongHop)
-          }).catch()
+      }).catch()
     },
     fnSubmit() {
       if (this.fileTongHop != null) {

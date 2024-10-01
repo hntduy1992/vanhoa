@@ -48,11 +48,10 @@
                 <th>Tiêu chí</th>
                 <th>Điểm lớn nhất</th>
                 <th>Tự đánh giá</th>
-                <th>Đính kèm</th>
                 <th>Ghi chú tự đánh giá</th>
                 <th>Thẩm định</th>
-                <th>Ghi chú thẩm định</th>
-                <th>Ý kiến đơn vị</th>
+                <th style="width: 15%">Ghi chú thẩm định</th>
+                <th style="width: 15%">Ý kiến đơn vị</th>
               </tr>
               </thead>
               <tbody>
@@ -106,12 +105,20 @@
             </v-btn>
             <v-spacer/>
             <v-btn
+                color="info"
+                :loading="isSubmitting"
+                :disabled="!disableSubmit"
+                @click="fnChangeState"
+            >
+              Thẩm định lại
+            </v-btn>
+            <v-btn
                 color="error"
                 :loading="isSubmitting"
                 :disabled="disableSubmit"
                 @click.stop="fnSubmit"
             >
-              Lưu lại
+              Xác nhận và kết thúc
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -169,17 +176,6 @@ export default {
   },
   computed: {
     ...mapState('khaoSatStore', ['bangDiem', 'cauHoi']),
-    years() {
-      const year = []
-      const current = (new Date().getFullYear()) + 2
-      for (let i = 2022; i < current; i++) {
-        year.push({
-          id: i,
-          name: `Năm ${i}`
-        })
-      }
-      return year.reverse()
-    }
   },
   watch: {
     namApDung() {
@@ -205,7 +201,13 @@ export default {
     this.fnGetNamApDung()
     this.$axios.get(`auth/don-vi/id/${this.$route.params.orgId}`).then(res => {
       this.donViDanhGia = res.data.data.tenDonVi
+      this.breadcrumbs.push({
+        text: this.donViDanhGia,
+        disabled: false,
+        href: '/Auth/KhaoSat/XacNhan/'+this.$route.params.orgId
+      })
     })
+
   },
   methods: {
     fnGetNamApDung() {
@@ -218,13 +220,13 @@ export default {
       })
     },
     async fnExportToWord() {
-      await this.$axios.post('auth/file-manager/export-to-word', {
+      await this.$axios.post('auth/file-manager/export-to-word/bien-ban', {
         bangDiem: this.bangDiem,
         cauHoi: this.cauHoi,
         danhMuc: this.categoryId,
         donVi: this.$route.params.orgId
       }).then((res) => {
-        window.location.href = process.env.VUE_APP_BASE_URL + 'storage/files/BienBan/' + res.data.file
+        window.location.href = process.env.VUE_APP_BASE_URL + 'storage/BienBan/' + res.data.file
       })
     },
     async fnGetDanhMuc() {
@@ -288,6 +290,20 @@ export default {
             this.$store.commit('khaoSatStore/kiemTraThamDinh', this.disableSubmit)
           }).catch()
     },
+    fnChangeState(){
+      this.isSubmitting = true
+      this.$axios.post('auth/khao-sat/xac-nhan/khoi-phuc-trang-thai', {
+        maDonVi: this.$route.params.orgId,
+        namApDung: this.namApDung.value,
+        maDanhMuc: this.categoryId,
+      })
+          .then((res) => {
+            this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
+          }).catch().finally(() => {
+        this.isSubmitting = false
+        this.fnGetAvailable()
+      })
+    },
     fnSubmit() {
       this.isSubmitting = true
       this.$axios.post('auth/khao-sat/xac-nhan/gui-diem-tong-hop', {
@@ -297,7 +313,10 @@ export default {
         diem: this.total2
       })
           .then((res) => {
+            this.disableSubmit = !res.data.data
             this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
+            // this.$axios.post('uth/file-manager/export-to-word/bien-ban',)
+            this.fnExportToWord()
           }).catch().finally(() => {
         this.isSubmitting = false
         this.fnGetAvailable()
@@ -329,12 +348,5 @@ table#xacnhan {
     }
   }
 
-  tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-
-  tr:hover {
-    background-color: #ddd;
-  }
 }
 </style>
