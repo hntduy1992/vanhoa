@@ -222,8 +222,6 @@ export default {
     })
   },
   methods: {
-
-
     fnGetDanhMuc() {
       this.$axios.get('auth/khao-sat/tham-dinh/danh-muc', {params: {namApDung: this.year}}).then((res) => {
         this.categories = (res.data?.data).map(item => ({

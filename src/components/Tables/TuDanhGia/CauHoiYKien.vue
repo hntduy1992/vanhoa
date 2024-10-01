@@ -72,30 +72,35 @@
                 >
                   mdi-cloud-download
                 </v-icon>
-                <v-icon
-                    class="red--text"
-                    right
-                    @click="clearFile(file)"
-                >
+              </v-btn>
+              <v-btn
+                  elevation="2"
+                  icon
+                  small
+                  @click="clearFile(file)"
+                  color="red"
+              >
+                <v-icon>
                   mdi-delete-circle-outline
                 </v-icon>
               </v-btn>
             </template>
             <span>Tải về</span>
           </v-tooltip>
-          <div v-if="question.danhDauCau == 1 && ghiChuDanhGia != null">
-            <v-textarea
-                v-model="ghiChuDanhGia"
-                label="Nội dung"
-                dense
-                outlined
-                hide-details
-                style="height: 100%; width: 100%"
-                no-resize
-                class="mt-2"
-                :readonly="true"
-            />
-          </div>
+
+        </div>
+        <div v-if="question.danhDauCau == 1 && ghiChuDanhGia != null">
+          <v-textarea
+              v-model="ghiChuDanhGia"
+              label="Nội dung"
+              dense
+              outlined
+              hide-details
+              style="height: 100%; width: 100%"
+              no-resize
+              class="mt-2"
+              :readonly="true"
+          />
         </div>
       </template>
     </td>
@@ -159,6 +164,10 @@ export default {
     question: {
       type: Object,
       default: null
+    },
+    namApDung: {
+      type: Number,
+      default: null
     }
   },
   emits:['updateFileDanhGia'],
@@ -168,7 +177,7 @@ export default {
       dialog2: false,
       loading: false,
       score: 0,
-      fileName: null,
+      fileName: [],
       ghiChuDanhGia: null,
       ghiChuThamDinh: null,
       ghiChuYKien: null,
@@ -194,7 +203,6 @@ export default {
         this.ghiChuDanhGia = item.ghiChuDanhGia
         this.ghiChuThamDinh = item.ghiChuThamDinh
       }
-      console.log(this.fileName, typeof (this.fileName))
     },
     ghiChuYKien(val) {
       if (val)
@@ -202,30 +210,34 @@ export default {
     }
   },
   methods: {
-    download() {
-      return process.env.VUE_APP_BASE_URL + 'storage/' + this.fileName
+    download(file) {
+      return process.env.VUE_APP_BASE_URL + 'storage/' + file.fileUrl
     },
-    async upload(files) {
+    upload(files) {
       this.loading = true
       if (!files) {
         this.loading = false
         return null
       }
       const formData = new FormData()
+      formData.append('maDanhMuc', this.question.maDanhMuc)
+      formData.append('maCauHoi', this.question.id)
+      formData.append('namApDung', this.namApDung)
       formData.append('file', files)
-      await this.$axios.post('auth/file-manager/singleUpload', formData, {
+      this.$axios.post('auth/file-manager/singleUpload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
       })
           .then((res) => {
             if (res.data.success) {
-              this.$store.commit('khaoSatStore/capNhatFile', {
-                id: this.question?.bangdiem?.id,
-                fileDanhGia: res.data.fileUrl
-              })
+              this.fileName.push({'fileUrl': res.data.fileUrl, 'fileName': res.data.fileName})
+              this.capNhatBangDiem()
+              this.$emit('updateFileDanhGia',this.fileName)
             }
-          }).catch()
+          }).catch(err => {
+        this.$store.dispatch('SnackbarStore/showSnackBar', err.message)
+      })
           .finally(() => {
             this.loading = false
           })
@@ -243,7 +255,7 @@ export default {
               this.fileName.splice(idx, 1)
             }
             this.capNhatBangDiem()
-            this.$emit('updateFileDanhGia')
+            this.$emit('updateFileDanhGia',this.fileName)
           })
     },
     capNhatBangDiem() {
@@ -251,10 +263,8 @@ export default {
       const dataStore = JSON.parse(JSON.stringify(this.bangDiem))
       const idx = dataStore.findIndex(item => item.maCauHoi === this.question.id)
       dataStore[idx].ghiChuThamDinh = this.ghiChuThamDinh
-      this.$store.commit('khaoSatStore/capNhatBangDiem', {
-        index: idx,
-        value: dataStore[idx]
-      })
+      dataStore[idx].fileDanhGia = JSON.stringify(this.fileName)
+      this.$store.commit('khaoSatStore/capNhatBangDiem', {index: idx, value: dataStore[idx]})
     }
   },
   created() {

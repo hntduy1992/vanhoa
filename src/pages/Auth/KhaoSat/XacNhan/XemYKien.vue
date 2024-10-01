@@ -12,24 +12,22 @@
             <v-row>
               <v-col cols="12" sm="3">
                 <v-select
-                    v-model="year"
+                    v-model="namApDung"
                     dense
                     label="Năm đánh giá"
-                    item-text="name"
-                    item-value="id"
-                    :items="years"
-                    disabled
+                    item-text="text"
+                    item-value="value"
+                    :items="namApDungs"
                 />
               </v-col>
               <v-col cols="12" sm="9">
                 <v-autocomplete
-                    v-model="tempCatId"
+                    v-model="categoryId"
                     dense
                     label="Bộ tiêu chí"
                     item-text="name"
                     item-value="id"
                     :items="categories"
-                    disabled
                 />
               </v-col>
             </v-row>
@@ -37,6 +35,7 @@
         </v-card>
       </v-col>
       <v-col cols="12">
+        <h3 class="text-uppercase text-center">{{ donViDanhGia }}</h3>
         <v-card>
           <v-card-text>
             <table
@@ -156,15 +155,16 @@ export default {
       iData: [],
       loading: false,
       questions: [],
-      year: new Date().getFullYear(),
+      namApDung: 0,
+      namApDungs: [],
       categoryId: 0,
-      tempCatId: 0,
       categories: [],
       isSubmitting: false,
       disableSubmit: true,
       total: 0,
       total1: 0,
-      total2: 0
+      total2: 0,
+      donViDanhGia: null
     }
   },
   computed: {
@@ -182,9 +182,7 @@ export default {
     }
   },
   watch: {
-    year() {
-      this.categoryId = 0
-      this.categories = []
+    namApDung() {
       this.data = []
       this.fnGetDanhMuc()
     },
@@ -204,10 +202,21 @@ export default {
     }
   },
   created() {
-    this.categoryId = this.$route.query.categoryId
-    this.fnGetDanhMuc()
+    this.fnGetNamApDung()
+    this.$axios.get(`auth/don-vi/id/${this.$route.params.orgId}`).then(res => {
+      this.donViDanhGia = res.data.data.tenDonVi
+    })
   },
   methods: {
+    fnGetNamApDung() {
+      this.$axios.get('auth/khao-sat/danh-muc/select-nam-ap-dung').then((res) => {
+        this.namApDungs = res.data.data.map((i) => ({
+          value: i,
+          text: i
+        }))
+        this.namApDung = this.namApDungs[0]
+      })
+    },
     async fnExportToWord() {
       await this.$axios.post('auth/file-manager/export-to-word', {
         bangDiem: this.bangDiem,
@@ -219,20 +228,17 @@ export default {
       })
     },
     async fnGetDanhMuc() {
-      await this.$axios.get('auth/khao-sat/xac-nhan/danh-muc', {params: {namApDung: this.year}}).then((res) => {
+      await this.$axios.get('auth/khao-sat/xac-nhan/danh-muc', {params: {namApDung: this.namApDung.value,maDonVi: this.$route.params.orgId}}).then((res) => {
         this.categories = (res.data?.data).map(item => ({
           id: item.id,
           name: item.tenDanhMuc
         }))
-        // this.categoryId = this.categories[0]?.id
-        setTimeout(() => {
-          this.categoryId = this.$route.query.categoryId
-        }, 1000)
-      }).catch()
-          .finally(() => {
-            this.tempCatId = parseInt(this.$route.query.categoryId.toString()) == 0 ? this.categories[0].id : parseInt(this.$route.query.categoryId.toString())
-          })
-      await this.fnGetAvailable()
+        this.categoryId = this.categories[0]?.id
+        this.fnGetAvailable()
+      }).catch((err) => {
+        // this.$store.dispatch('SnackbarStore/showSnackBar', err)
+        console.log(err)
+      })
     },
     fnGetCauHoi() {
       this.$axios.get('auth/khao-sat/xac-nhan/cau-hoi', {
@@ -286,7 +292,7 @@ export default {
       this.isSubmitting = true
       this.$axios.post('auth/khao-sat/xac-nhan/gui-diem-tong-hop', {
         maDonVi: this.$route.params.orgId,
-        namApDung: this.year,
+        namApDung: this.namApDung.value,
         maDanhMuc: this.categoryId,
         diem: this.total2
       })

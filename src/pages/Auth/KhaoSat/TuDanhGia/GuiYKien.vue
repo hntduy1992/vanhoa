@@ -56,7 +56,8 @@
               <tbody>
               <template v-for="(item, idx) in iData">
                 <template v-if="item.danhDauCau < 2">
-                  <CauHoi :key="item + idx" :question="item" :nam-ap-dung="namApDung.value"  />
+                  <CauHoi :key="item + idx" :question="item" :nam-ap-dung="namApDung.value"
+                          @updateFileDanhGia="(e)=>updateFileDanhGia(item.bangdiem.id,e)"/>
                 </template>
                 <template v-if="item.danhDauCau >= 2">
                   <CauTraLoi :key="item + idx" :question="item"/>
@@ -214,7 +215,7 @@ export default {
       total: 0,
       total1: 0,
       total2: 0,
-      dialog: false
+      dialog: false,
     }
   },
   computed: {
@@ -330,11 +331,18 @@ export default {
       this.isSubmitting = true
       this.dialog = true
     },
+    updateFileDanhGia(id, file) {
+      this.$axios.post('auth/khao-sat/tu-danh-gia/update-file-danh-gia', {
+        id: id,
+        fileDanhGia: JSON.stringify(file)
+      }).then((res) => {
+        this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
+      })
+    },
     fnSendYKien(isSave) {
       this.$axios.post('auth/khao-sat/tu-danh-gia/gui-y-kien', {
         maDanhMuc: this.categoryId,
         bangYKien: this.bangYKien,
-        capNhatFileDanhGia: this.capNhatFileDanhGia,
         isSave: isSave
       })
           .then((res) => {
