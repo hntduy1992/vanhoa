@@ -19,7 +19,7 @@
     <td :rowspan="question.danhDauCau == 1 && question.childrenCount > 0 ? question.childrenCount + 1 : false"
         class="text-center">
       <template v-if="question.danhDauCau == 1">
-        <label class="v-btn blue-grey pa-2 text--white"
+        <label class="v-btn blue-grey pa-2 white--text"
                :for="'uploadFile_' + question.id">
           Minh chứng
           <v-icon
@@ -56,7 +56,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                     color="blue-grey"
-                    class="ma-2 white--text"
+                    class="white--text"
                     elevation="0"
                     small
                     link
@@ -65,13 +65,13 @@
                     v-on="on"
                     :href="download(file.fileUrl)"
                 >
+                  <span class="ml-2">{{ file.fileName }}</span>
                   <v-icon
                       dark
-                      left
+                      right
                   >
                     mdi-cloud-download
                   </v-icon>
-                  <span class="ml-2">{{ file.fileName }}</span>
                 </v-btn>
                 <v-btn
                     icon
@@ -81,7 +81,7 @@
                   <v-icon>mdi-delete-circle-outline</v-icon>
                 </v-btn>
               </template>
-              <span></span>
+              <span>Tải về</span>
             </v-tooltip>
           </v-list-item>
         </v-list>
@@ -174,7 +174,7 @@ export default {
             if (res.data.success) {
               this.fileName.push({'fileUrl': res.data.fileUrl, 'fileName': res.data.fileName})
               this.capNhatBangDiem()
-              this.$emit('updateFileDanhGia')
+              this.$emit('updateFileDanhGia', this.fileName)
             }
           }).catch()
           .finally(() => {

@@ -33,13 +33,13 @@
                       v-on="on"
                       :href="download(file.fileUrl)"
                   >
+                    <span class="ml-2">{{ file.fileName }}</span>
                     <v-icon
                         dark
-                        left
+                        right
                     >
                       mdi-cloud-download
                     </v-icon>
-                    <span class="ml-2">{{ file.fileName }}</span>
                   </v-btn>
                 </template>
               </v-tooltip>

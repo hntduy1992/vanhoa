@@ -108,17 +108,17 @@
                       clearable
                       @change="upload"
                       class="me-2"
-                      :disabled="(fileTongHop!=null)"
+                      :disabled="(fileBienBan!=null)"
                   />
                   <v-btn
                       icon
                       color="red"
                       @click="clearFile"
-                      v-if="fileTongHop"
+                      v-if="fileBienBan"
                   >
                     <v-icon>mdi-refresh</v-icon>
                   </v-btn>
-                  <v-tooltip v-if="fileTongHop" :text="fileTongHop.fileName">
+                  <v-tooltip v-if="fileBienBan" :text="fileBienBan.fileName">
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
                           color="blue-grey"
@@ -151,7 +151,7 @@
             <v-btn
                 color="error"
                 :loading="isSubmitting"
-                :disabled="disableSubmit && trangThaiHienTai>3"
+                :disabled="disableSubmit && trangThaiHienTai>3 && !fileBienBan"
                 @click.stop="fnSubmit"
             >
               Gửi điểm
@@ -240,7 +240,7 @@ export default {
       disableSubmit: true,
       total: 0,
       total1: 0,
-      fileTongHop: null,
+      fileBienBan: null,
       trangThaiHienTai: null,
       headers: [
         {
@@ -373,15 +373,15 @@ export default {
         this.disableSubmit = !res.data.data
         this.trangThaiHienTai = res.data.trangThai
         this.$store.commit('khaoSatStore/kiemTraTuDanhGia', this.disableSubmit)
-        this.fileTongHop = JSON.parse(res.data.fileTongHop)
+        this.fileBienBan = JSON.parse(res.data.fileBienBan)
       }).catch()
     },
     fnSubmit() {
-      if (this.fileTongHop != null) {
+      if (this.fileBienBan != null) {
         this.isSubmitting = true
         this.$axios.post('auth/khao-sat/tu-danh-gia/gui-diem', {
           maDanhMuc: this.categoryId,
-          fileName: JSON.stringify(this.fileTongHop)
+          fileName: JSON.stringify(this.fileBienBan)
         })
             .then((res) => {
               this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
