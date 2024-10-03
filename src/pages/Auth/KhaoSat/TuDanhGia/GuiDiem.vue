@@ -108,7 +108,7 @@
                       clearable
                       @change="upload"
                       class="me-2"
-                      :disabled="(fileBienBan!=null)"
+                      :disabled="(fileBienBan!==null)"
                   />
                   <v-btn
                       icon
@@ -141,7 +141,6 @@
                   Biên bản
                 </span>
                       </v-btn>
-
                     </template>
                   </v-tooltip>
                 </div>
@@ -151,7 +150,7 @@
             <v-btn
                 color="error"
                 :loading="isSubmitting"
-                :disabled="disableSubmit && trangThaiHienTai>3 && !fileBienBan"
+                :disabled="disableSubmit || trangThaiHienTai>3 || !fileBienBan"
                 @click.stop="fnSubmit"
             >
               Gửi điểm
@@ -228,7 +227,6 @@ export default {
         }
       ],
       dialog: false,
-      // category: {},
       iData: [],
       loading: false,
       questions: [],
@@ -394,7 +392,7 @@ export default {
       }
     },
     download() {
-      return process.env.VUE_APP_BASE_URL + 'storage/' + this.fileTongHop.fileUrl
+      return process.env.VUE_APP_BASE_URL + 'storage/' + this.fileBienBan.fileUrl
     },
     upload(files) {
       this.loading = true
@@ -412,16 +410,16 @@ export default {
       })
           .then((res) => {
             if (res.data.success) {
-              this.fileTongHop = {fileUrl: res.data.fileUrl, fileName: res.data.fileName}
-              this.fnSubmit()
+              this.fileBienBan = {fileUrl: res.data.fileUrl, fileName: res.data.fileName}
             }
           }).catch()
           .finally(() => {
+            this.fnSubmit()
             this.loading = false
           })
     },
     clearFile() {
-      this.fileTongHop = null
+      this.fileBienBan = null
     }
   }
 }

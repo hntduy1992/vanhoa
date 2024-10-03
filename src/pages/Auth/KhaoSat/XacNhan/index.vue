@@ -91,6 +91,22 @@
                 <span class="font-weight-bold">{{ parseFloat(value).toFixed(2) }}</span>
               </template>
               <template #[`item.trangThaiHienTai`]="{ value, item }">
+                <v-chip
+                    v-if="value === 1"
+                    close-icon="mdi-close-outline"
+                    color="green"
+                    outlined
+                >
+                  Tự chấm điểm
+                </v-chip>
+                <v-chip
+                    v-if="value === 2"
+                    close-icon="mdi-close-outline"
+                    color="purple"
+                    outlined
+                >
+                  Đã gởi điểm, chờ thẩm định
+                </v-chip>
                 <v-btn
                     v-if="value === 3 && item.dathamdinh === 0"
                     small
