@@ -3,14 +3,14 @@
     <validation-observer ref="observer">
       <v-row>
         <v-col cols="12">
-          <IBreadcrumb :items="breadcrumbs" />
+          <IBreadcrumb :items="breadcrumbs"/>
         </v-col>
         <v-col cols="12">
           <v-card>
             <v-toolbar dense elevation="0">
               <v-toolbar-title>THÔNG TIN</v-toolbar-title>
             </v-toolbar>
-            <v-divider />
+            <v-divider/>
             <v-card-text>
               <v-row dense>
                 <v-col cols="12" sm="12" md="12">
@@ -52,6 +52,15 @@
                       :return-object="false"
                   />
                 </v-col>
+                <v-col cols="12" sm="12" md="12">
+                  <VTextValidation
+                      v-model="item.diemChuan"
+                      dense
+                      outlined
+                      label="Điểm chuẩn"
+                      :rules="{ required: true, numeric: true }"
+                  />
+                </v-col>
               </v-row>
             </v-card-text>
           </v-card>
@@ -60,7 +69,7 @@
           <v-card>
             <v-toolbar dense elevation="0">
               <v-toolbar-title>ĐƠN VỊ ÁP DỤNG</v-toolbar-title>
-              <v-spacer />
+              <v-spacer/>
               <v-text-field
                   v-model="search"
                   label="Tìm kiếm"
@@ -71,7 +80,7 @@
                   class="mr-2"
               />
             </v-toolbar>
-            <v-divider />
+            <v-divider/>
             <v-card-text>
               <v-row dense>
                 <v-col cols="12">
@@ -89,7 +98,7 @@
                 </v-col>
               </v-row>
             </v-card-text>
-            <v-divider />
+            <v-divider/>
             <v-card-actions class="justify-end">
               <v-btn elevation="0" shaped color="warning" @click="fnReset">
                 <v-icon>mdi-reload</v-icon>
@@ -108,9 +117,9 @@
 </template>
 
 <script>
-import { ValidationObserver } from 'vee-validate'
+import {ValidationObserver} from 'vee-validate'
 import VTextValidation from '@/components/Validations/VTextValidation'
-import { khaoSatDanhMucModel } from '@/models/khaoSatDanhMucModel'
+import {khaoSatDanhMucModel} from '@/models/khaoSatDanhMucModel'
 import LayoutDefault from "@/layouts/default";
 import IBreadcrumb from "@/components/IBreadcrumb";
 
@@ -152,8 +161,7 @@ export default {
       organizationId: null
     }
   },
-  watch: {
-  },
+  watch: {},
   methods: {
     async fnGetOrg() {
       await this.$axios.get('auth/don-vi/select').then((res) => {

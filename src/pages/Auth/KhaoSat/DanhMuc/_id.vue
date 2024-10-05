@@ -53,6 +53,15 @@
                       @change="fnGetOrg"
                   />
                 </v-col>
+                <v-col cols="12" sm="12" md="12">
+                  <VTextValidation
+                      v-model="item.diemChuan"
+                      dense
+                      outlined
+                      label="Điểm chuẩn"
+                      :rules="{ required: true, numeric: true }"
+                  />
+                </v-col>
               </v-row>
             </v-card-text>
           </v-card>

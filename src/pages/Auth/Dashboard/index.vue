@@ -13,34 +13,29 @@
       </v-tab>
       <v-tab-item
           class="py-2 px-1"
-         :key="1"
+          :key="1"
       >
-       <div class="d-flex justify-center align-center mb-2">
-         <label for="selectYear" class="v-label me-2" >Chọn năm </label>
-         <div style="width: 100px">
-           <v-select id="selectYear"  v-model="this.namApDung"  outlined hide-details dense :items="this.listNamApDung">
-           </v-select>
-         </div>
-       </div>
+        <div class="d-flex align-center mb-2" style="width: 150px">
+          <label for="selectYear" class="v-label me-2 text-no-wrap">Chọn năm </label>
+          <v-select
+              id="selectYear"
+              v-model="namApDung"
+              item-text="text"
+              item-value="value"
+              solo
+              return-object
+              hide-details
+              :items="namApDungs"
+          />
+        </div>
         <v-row>
-          <v-col cols="12" md="6">
+          <v-col cols="12" v-for="(item,i) of data" :key="item.id +'_'+i">
             <v-card>
-              <v-toolbar dense elevation="0" class="py-3">
-                <h4>XÃ, PHƯỜNG, THỊ TRẤN TIÊU BIỂU</h4>
+              <v-toolbar dense elevation="4">
+                <h4>{{ item.tenDanhMuc }}</h4>
               </v-toolbar>
               <v-card-text>
-                <v-chart class="chart" autoresize :option="chartXepHang"/>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-card>
-              <v-toolbar dense elevation="0" class="py-3">
-                <h4>KHÓM, ẤP VĂN HÓA</h4>
-                <v-spacer/>
-              </v-toolbar>
-              <v-card-text>
-                <v-chart class="chart" autoresize :option="chartXepHangDonVi"/>
+                <v-chart class="chart" autoresize :option="fnLoadChartInfo(item.donVis,item.diemChuan)"/>
               </v-card-text>
             </v-card>
           </v-col>
@@ -96,144 +91,83 @@ export default {
   },
   data() {
     return {
-      chartXepHang: {
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
-          }
-        },
-        legend: {},
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
-        },
-        xAxis: {
-          type: 'value'
-        },
-        yAxis: {
-          type: 'category',
-          data: []
-        },
-        series: [
-          {
-            name: 'Tổng điểm',
-            type: 'bar',
-            itemStyle: {
-              color: '#a90000'
-            },
-            label: {
-              show: true,
-              position: 'inside',
-              color: '#fff',
-              formatter(param) {
-                return param.data === 0 ? '' : param.data
-              }
-            },
-            data: []
-          }
-        ]
-      },
-      chartXepHangDonVi: {
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
-          }
-        },
-        legend: {},
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
-        },
-        xAxis: {
-          type: 'value'
-        },
-        yAxis: {
-          type: 'category',
-          data: []
-        },
-        series: [
-          {
-            name: 'Tổng điểm',
-            type: 'bar',
-            itemStyle: {
-              color: '#a90000'
-            },
-            label: {
-              show: true,
-              position: 'inside',
-              color: '#fff',
-              formatter(param) {
-                return param.data === 0 ? '' : param.data
-              }
-            },
-            data: []
-          }
-        ]
-      },
-      namApDung: null,
-      listNamApDung:[]
+      data: [],
+      namApDung: {},
+      namApDungs: []
     }
   },
   created() {
-    this.fnGetBangXepHang()
-    this.fnGetBangXepHangCuaDonVi()
     this.fnGetNamApDung()
   },
   methods: {
-    fnGetNamApDung(){
+    fnGetNamApDung() {
       this.$axios.get('auth/khao-sat/danh-muc/select-nam-ap-dung').then((res) => {
-        this.listNamApDung = res.data.data
-        this.namApDung = this.listNamApDung.length?this.listNamApDung[0]:null
+        this.namApDungs = res.data.data.map((i) => ({
+          value: i,
+          text: i
+        }))
+        this.namApDung = this.namApDungs[0]
+        this.fnGetThongKeBXH()
+      }).catch((err) => {
+        console.log(err)
       })
     },
-    fnGetBangXepHang() {
-      this.$axios.get('auth/khao-sat/thong-ke/bang-xep-hang', {
+    fnGetThongKeBXH() {
+      this.$axios.get('auth/khao-sat/thong-ke/thong-ke-bang-xep-hang', {
         params: {
-          namApDung: this.namApDung,
-          phanLoai: 1
+          namApDung: this.namApDung.value,
         }
       }).then((res) => {
-        const donVi = []
-        const data = []
-        for (const [key, value] of Object.entries(res.data.data)) {
-          if (value >= 3) {
-            donVi.push('(Đạt) ' + key)
-          } else {
-            donVi.push(key)
-          }
-          data.push(value)
-        }
-        this.chartXepHang.yAxis.data = donVi
-        this.chartXepHang.series[0].data = data
-      })
+        this.data = res.data.data
+      });
     },
-    fnGetBangXepHangCuaDonVi() {
-      this.$axios.get('auth/khao-sat/thong-ke/bang-xep-hang', {
-        params: {
-          namApDung: this.namApDung,
-          phanLoai: 2
-        }
-      }).then((res) => {
-        const donVi = []
-        const data = []
-        for (const [key, value] of Object.entries(res.data.data)) {
-          if (value >= 3) {
-            donVi.push('(Đạt) ' + key)
-          } else {
-            donVi.push(key)
+    fnLoadChartInfo(donvi, diemChuan) {
+      for (let i = 0; i < donvi.diem.length; i++) {
+        if (donvi.diem[i] >= diemChuan)
+          donvi.tenDonVi[i] = '(Đạt chuẩn) ' + donvi.tenDonVi[i]
+      }
+      return {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
           }
-          data.push(value)
-        }
-        this.chartXepHangDonVi.yAxis.data = donVi
-        this.chartXepHangDonVi.series[0].data = data
-      })
-    }
+        },
+        legend: {},
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'value',
+        },
+        yAxis: {
+          type: 'category',
+          data: donvi.tenDonVi,
+
+        },
+        series: [
+          {
+            name: 'Tổng điểm',
+            type: 'bar',
+            itemStyle: {
+              color: '#a90000',
+            },
+            label: {
+              show: true,
+              position: 'inside',
+              color: '#fff',
+              formatter(param) {
+                return param.data === 0 ? '' : param.data
+              }
+            },
+            data: donvi.diem
+          }
+        ]
+      }
+    },
   }
 }
 </script>
