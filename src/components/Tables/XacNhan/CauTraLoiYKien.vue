@@ -7,116 +7,11 @@
             <td>
                 {{ question.tenCauHoi }}
             </td>
-            <td/>
             <td class="text-center">
-                <template v-if="question.loaiCauHoi === 1">
-                    <v-text-field
-                        v-if="question.kieuNhapLieu === 'Text'"
-                        v-model="formInput"
-                        dense
-                        hide-details
-                        outlined
-                        label="Nhập điểm"
-                        :disabled="true"
-                    />
-                    <v-select
-                        v-else-if="question.kieuNhapLieu === 'Select'"
-                        v-model="formInput"
-                        dense
-                        hide-details
-                        placeholder="Chọn"
-                        style="width: 70px; min-width: 0; margin: 0 auto"
-                        item-text="name"
-                        item-value="id"
-                        :return-object="false"
-                        :items="points"
-                        :disabled="true"
-                    />
-                    <v-checkbox
-                        v-else-if="question.kieuNhapLieu === 'Checkbox'"
-                        v-model="formInput"
-                        dense
-                        hide-details
-                        color="red"
-                        class="align-center justify-center pa-0"
-                        style="margin: 0 auto; width: 24px;"
-                        :value="question.diemLonNhat"
-                        :true-value="question.diemLonNhat"
-                        :input-value="question.diemLonNhat"
-                        :disabled="true"
-                    />
-                    <v-radio-group
-                        v-else
-                        v-model="formInput"
-                        dense
-                        hide-details
-                        class="pa-0"
-                        style="margin: 0 auto; width: 24px;"
-                        :disabled="true"
-                    >
-                        <v-radio
-                            color="red"
-                            :value="question.diemLonNhat"
-                        />
-                    </v-radio-group>
-                </template>
+              {{ formInput }}
             </td>
-            <td>
-                <template>
-                    <v-text-field
-                        v-if="question.kieuNhapLieu === 'Text'"
-                        v-model="formThamDinh"
-                        dense
-                        hide-details
-                        outlined
-                        label="Nhập điểm"
-                        :disabled="dontHavePermission"
-                        @change="fnChangePoint"
-                    />
-                    <v-select
-                        v-else-if="question.kieuNhapLieu === 'Select'"
-                        v-model="formThamDinh"
-                        dense
-                        hide-details
-                        placeholder="Chọn"
-                        style="width: 70px; min-width: 0; margin: 0 auto"
-                        item-text="name"
-                        item-value="id"
-                        :return-object="false"
-                        :items="points"
-                        :disabled="dontHavePermission"
-                        @change="fnChangePoint"
-                    />
-                    <v-checkbox
-                        v-else-if="question.kieuNhapLieu === 'Checkbox'"
-                        v-model="formThamDinh"
-                        dense
-                        hide-details
-                        color="red"
-                        class="align-center justify-center pa-0"
-                        style="margin: 0 auto; width: 24px;"
-                        :value="question.diemLonNhat"
-                        :true-value="question.diemLonNhat"
-                        :input-value="question.diemLonNhat"
-                        :disabled="dontHavePermission"
-                        @change="fnChangePoint"
-                    />
-                    <v-radio-group
-                        v-else
-                        v-model="formThamDinh"
-                        dense
-                        hide-details
-                        class="pa-0"
-                        style="margin: 0 auto; width: 24px;"
-                        :disabled="dontHavePermission"
-                        @change="fnChangePoint"
-                    >
-                        <v-radio
-                            color="red"
-                            :value="question.diemLonNhat"
-                        />
-                    </v-radio-group>
-                </template>
+          <td class="text-center">
+            {{ formThamDinh }}
             </td>
         </template>
         <template v-else>
@@ -128,119 +23,10 @@
             </td>
             <td/>
             <td class="text-center">
-                <template v-if="question.loaiCauHoi === 1 && question.danhDauCau === 3">
-                    <v-text-field
-                        v-if="question.kieuNhapLieu === 'Text'"
-                        v-model="formInput"
-                        dense
-                        hide-details
-                        outlined
-                        label="Nhập điểm"
-                        :disabled="true"
-                    />
-                    <v-select
-                        v-else-if="question.kieuNhapLieu === 'Select'"
-                        v-model="formInput"
-                        dense
-                        hide-details
-                        placeholder="Chọn"
-                        style="width: 70px; min-width: 0; margin: 0 auto"
-                        item-text="name"
-                        item-value="id"
-                        :return-object="false"
-                        :items="points"
-                        :disabled="true"
-                    />
-                    <v-checkbox
-                        v-else-if="question.kieuNhapLieu === 'Checkbox'"
-                        v-model="formInput"
-                        dense
-                        hide-details
-                        color="red"
-                        class="align-center justify-center pa-0"
-                        style="margin: 0 auto; width: 24px;"
-                        :value="question.diemLonNhat"
-                        :true-value="question.diemLonNhat"
-                        :input-value="question.diemLonNhat"
-                        :disabled="true"
-                    />
-                    <v-radio-group
-                        v-else
-                        v-model="formInput"
-                        dense
-                        hide-details
-                        class="pa-0"
-                        style="margin: 0 auto; width: 24px;"
-                        :disabled="true"
-                    >
-                        <v-radio
-                            color="red"
-                            :value="question.diemLonNhat"
-                        />
-                    </v-radio-group>
-                </template>
-                <template v-else>
-                    <span class="font-weight-bold">ĐTXHH</span>
-                </template>
+              {{ formInput }}
             </td>
-            <td/>
-            <td/>
-            <td>
-                <template>
-                    <v-text-field
-                        v-if="question.kieuNhapLieu === 'Text'"
-                        v-model="formThamDinh"
-                        dense
-                        hide-details
-                        outlined
-                        label="Nhập điểm"
-                        :disabled="dontHavePermission"
-                        @change="fnChangePoint"
-                    />
-                    <v-select
-                        v-else-if="question.kieuNhapLieu === 'Select'"
-                        v-model="formThamDinh"
-                        dense
-                        hide-details
-                        placeholder="Chọn"
-                        style="width: 70px; min-width: 0; margin: 0 auto"
-                        item-text="name"
-                        item-value="id"
-                        :return-object="false"
-                        :items="points"
-                        :disabled="dontHavePermission"
-                        @change="fnChangePoint"
-                    />
-                    <v-checkbox
-                        v-else-if="question.kieuNhapLieu === 'Checkbox'"
-                        v-model="formThamDinh"
-                        dense
-                        hide-details
-                        color="red"
-                        class="align-center justify-center pa-0"
-                        style="margin: 0 auto; width: 24px;"
-                        :value="question.diemLonNhat"
-                        :true-value="question.diemLonNhat"
-                        :input-value="question.diemLonNhat"
-                        :disabled="dontHavePermission"
-                        @change="fnChangePoint"
-                    />
-                    <v-radio-group
-                        v-else
-                        v-model="formThamDinh"
-                        dense
-                        hide-details
-                        class="pa-0"
-                        style="margin: 0 auto; width: 24px;"
-                        :disabled="dontHavePermission"
-                        @change="fnChangePoint"
-                    >
-                        <v-radio
-                            color="red"
-                            :value="question.diemLonNhat"
-                        />
-                    </v-radio-group>
-                </template>
+          <td class="text-center">
+            {{ formThamDinh }}
             </td>
             <td class="text-center">
                 <template v-if="question.danhDauCau === 3 && ghiChuThamDinh != null">
@@ -309,22 +95,18 @@ export default {
         ...mapGetters('authStore', ['auth']),
         ...mapState('khaoSatStore', ['disableThamDinh', 'permissions']),
         points() {
-            const rPoints = []
-            let counter = JSON.parse(JSON.stringify(this.question.diemNhoNhat));
-            while (Number(counter.toFixed(2)) <= this.question.diemLonNhat) {
-                rPoints.push({
-                    id: Number(counter.toFixed(2)),
-                    name: counter.toFixed(2)
-                })
-                counter += this.question.buocNhay
-            }
-            /*for (let i = JSON.parse(JSON.stringify(this.question.diemNhoNhat)); i < this.question.diemLonNhat; i += this.question.buocNhay) {
-                rPoints.push({
-                    id: Number(i.toFixed(2)),
-                    name: i.toFixed(2)
-                })
-            }*/
-            return rPoints
+          const rPoints = []
+          let counter = JSON.parse(JSON.stringify(this.question.diemLonNhat));
+          // select giam
+          do {
+            rPoints.push({
+              id: Number(counter.toFixed(2)),
+              name: counter.toFixed(2)
+            })
+            counter -= this.question.buocNhay
+          }
+          while (Number(counter.toFixed(2)) >= (this.question.diemNhoNhat && 0));
+          return rPoints
         },
         parent() {
             return this.cauHoi.find(model => model.maCauHoi === this.question.parentId) || {}

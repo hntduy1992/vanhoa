@@ -54,7 +54,8 @@
                 <tbody>
                 <template v-for="(item, idx) in items">
                   <template v-if="item.danhDauCau < 2">
-                    <CauHoi :key="item + idx" :question="item" :nam-ap-dung="namApDung.value" @updateFileDanhGia="fnSubmit"/>
+                    <CauHoi :key="item + idx" :question="item" :nam-ap-dung="namApDung.value"
+                            @updateFileDanhGia="(e)=>updateFileDanhGia(item.id,e)"/>
                   </template>
                   <template v-if="item.danhDauCau >= 2">
                     <CauTraLoi :key="item + idx" :question="item"/>
@@ -171,30 +172,29 @@ export default {
         {
           text: 'Tiêu chí',
           value: 'name',
-          width: 275
         },
         {
           text: 'Điểm tối đa',
           value: 'maxScore',
-          width: 55,
+          width: '10%',
           align: 'center'
         },
         {
           text: 'Tự đánh giá',
           value: 'year',
-          width: 75,
+          width: '10%',
           align: 'center'
         },
         {
           text: 'Đính kèm',
           value: 'year',
-          width: 80,
+          width: '20%',
           align: 'center'
         },
         {
           text: 'Ghi chú',
           value: 'year',
-          width: 80,
+          width: '20%',
           align: 'center'
         }
       ]
@@ -234,8 +234,9 @@ export default {
         this.namApDung = this.namApDungs[0]
       })
     },
-    async fnExportToWord() {
-      await this.$axios.post('auth/file-manager/export-to-word', {
+    fnExportToWord() {
+      this.fnSubmit()
+      this.$axios.post('auth/file-manager/export-to-word', {
         bangDiem: this.bangDiem,
         cauHoi: this.cauHoi,
         danhMuc: this.categoryId
@@ -243,15 +244,15 @@ export default {
         window.location.href = process.env.VUE_APP_BASE_URL + 'storage/TuDanhGia/' + res.data.file
       })
     },
-    async fnGetDanhMuc() {
-      await this.$axios.get('auth/khao-sat/tu-danh-gia/danh-muc', {params: {namApDung: this.namApDung.value}}).then((res) => {
+    fnGetDanhMuc() {
+      this.$axios.get('auth/khao-sat/tu-danh-gia/danh-muc', {params: {namApDung: this.namApDung.value}}).then((res) => {
         this.categories = (res.data?.data).map(item => ({
           id: item.id,
           name: item.tenDanhMuc
         }))
         this.categoryId = this.categories[0]?.id
+        this.fnGetAvailable()
       }).catch()
-      this.fnGetAvailable()
     },
     fnGetCauHoi() {
       this.$axios.get('auth/khao-sat/tu-danh-gia/cau-hoi', {
@@ -291,19 +292,29 @@ export default {
         }, 1)
       }).catch()
     },
-    async fnGetAvailable() {
-      await this.$axios.post('auth/khao-sat/tu-danh-gia/kiem-tra-hop-le', {maDanhMuc: this.categoryId})
+    fnGetAvailable() {
+      this.$axios.post('auth/khao-sat/tu-danh-gia/kiem-tra-hop-le', {maDanhMuc: this.categoryId})
           .then((res) => {
             this.disableSubmit = !res.data.data
             this.$store.commit('khaoSatStore/kiemTraTuDanhGia', this.disableSubmit)
           }).catch()
+    },
+    updateFileDanhGia(id, file) {
+      this.$axios.post('auth/khao-sat/tu-danh-gia/update-file-danh-gia', {
+        id: id,
+        fileDanhGia: JSON.stringify(file)
+      }).then(() => {
+        this.fnSubmit()
+      })
     },
     fnSubmit() {
       this.isSubmitting = true
       this.$axios.post('auth/khao-sat/tu-danh-gia/luu-diem', this.$store.getters['khaoSatStore/bangDiem'])
           .then((res) => {
             this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
-          }).catch().finally(() => {
+          }).catch(e => {
+        this.$store.dispatch('SnackbarStore/showSnackBar', e.response.statusText)
+      }).finally(() => {
         this.isSubmitting = false
       })
     }

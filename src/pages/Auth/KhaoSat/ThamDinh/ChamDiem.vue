@@ -48,10 +48,10 @@
               <tr>
                 <th>STT</th>
                 <th>Tiêu chí</th>
-                <th>Điểm lớn nhất</th>
-                <th>Tự đánh giá</th>
+                <th style="width: 75px">Điểm lớn nhất</th>
+                <th style="width: 75px">Tự đánh giá</th>
                 <th>Ghi chú tự đánh giá</th>
-                <th>Thẩm định</th>
+                <th style="width: 75px">Thẩm định</th>
                 <th style="width: 15vw">Ghi chú thẩm định</th>
                 <th v-if="$route.query.thamDinhLai == 1">Ý kiến đơn vị</th>
               </tr>
@@ -222,8 +222,6 @@ export default {
     })
   },
   methods: {
-
-
     fnGetDanhMuc() {
       this.$axios.get('auth/khao-sat/tham-dinh/danh-muc', {params: {namApDung: this.year}}).then((res) => {
         this.categories = (res.data?.data).map(item => ({

@@ -17,7 +17,7 @@
       >{{ parseFloat(diemTuDanhGia).toFixed(2) }}</span>
     </td>
     <td :rowspan="question.danhDauCau === 1 && question.childrenCount > 0 ? question.childrenCount + 1 : false"
-        class="w-cell-100">
+        class="w-cell-100 text-center">
       <template v-if="fileName">
         <v-btn
             v-for="(file,index) of fileName" :key="index"
@@ -29,13 +29,13 @@
             target="_blank"
             :href="download(file.fileUrl)"
         >
+          <span>{{ file.fileName }}</span>
           <v-icon
               dark
-              left
+              right
           >
             mdi-cloud-download
           </v-icon>
-          <span>{{ file.fileName }}</span>
         </v-btn>
       </template>
       <template v-if="question.danhDauCau === 1 && ghiChuDanhGia != null">

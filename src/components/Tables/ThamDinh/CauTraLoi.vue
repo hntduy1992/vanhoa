@@ -12,55 +12,7 @@
       </td>
       <td class="text-center" >
         <template v-if="question.loaiCauHoi === 1">
-          <v-text-field
-              v-if="question.kieuNhapLieu === 'Text'"
-              v-model="formInput"
-              dense
-              hide-details
-              outlined
-              label="Nhập điểm"
-              :disabled="true"
-          />
-          <v-select
-              v-else-if="question.kieuNhapLieu === 'Select'"
-              v-model="formInput"
-              dense
-              hide-details
-              placeholder="Chọn"
-              style="width: 70px; min-width: 0; margin: 0 auto"
-              item-text="name"
-              item-value="id"
-              :return-object="false"
-              :items="points"
-              :disabled="true"
-          />
-          <v-checkbox
-              v-else-if="question.kieuNhapLieu === 'Checkbox'"
-              v-model="formInput"
-              dense
-              hide-details
-              color="red"
-              class="align-center justify-center pa-0"
-              style="margin: 0 auto; width: 24px;"
-              :value="question.diemLonNhat"
-              :true-value="question.diemLonNhat"
-              :input-value="question.diemLonNhat"
-              :disabled="true"
-          />
-          <v-radio-group
-              v-else
-              v-model="formInput"
-              dense
-              hide-details
-              class="pa-0"
-              style="margin: 0 auto; width: 24px;"
-              :disabled="true"
-          >
-            <v-radio
-                color="red"
-                :value="question.diemLonNhat"
-            />
-          </v-radio-group>
+          {{formInput}}
         </template>
       </td>
       <td class="text-center px-2"  >
@@ -131,55 +83,7 @@
       <td/>
       <td class="text-center"  >
         <template v-if="question.loaiCauHoi === 1 && question.danhDauCau === 3">
-          <v-text-field
-              v-if="question.kieuNhapLieu === 'Text'"
-              v-model="formInput"
-              dense
-              hide-details
-              outlined
-              label="Nhập điểm"
-              :disabled="true"
-          />
-          <v-select
-              v-else-if="question.kieuNhapLieu === 'Select'"
-              v-model="formInput"
-              dense
-              hide-details
-              placeholder="Chọn"
-              style="width: 70px; min-width: 0; margin: 0 auto"
-              item-text="name"
-              item-value="id"
-              :return-object="false"
-              :items="points"
-              :disabled="true"
-          />
-          <v-checkbox
-              v-else-if="question.kieuNhapLieu === 'Checkbox'"
-              v-model="formInput"
-              dense
-              hide-details
-              color="red"
-              class="align-center justify-center pa-0"
-              style="margin: 0 auto; width: 24px;"
-              :value="question.diemLonNhat"
-              :true-value="question.diemLonNhat"
-              :input-value="question.diemLonNhat"
-              :disabled="true"
-          />
-          <v-radio-group
-              v-else
-              v-model="formInput"
-              dense
-              hide-details
-              class="pa-0"
-              style="margin: 0 auto; width: 24px;"
-              :disabled="true"
-          >
-            <v-radio
-                color="red"
-                :value="question.diemLonNhat"
-            />
-          </v-radio-group>
+          {{formInput}}
         </template>
         <template v-else>
           <span class="font-weight-bold">ĐTXHH</span>

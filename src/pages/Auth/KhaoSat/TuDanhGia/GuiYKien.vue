@@ -12,13 +12,12 @@
             <v-row>
               <v-col cols="12" sm="3">
                 <v-select
-                    v-model="year"
+                    v-model="namApDung"
                     dense
                     label="Năm đánh giá"
-                    item-text="name"
-                    item-value="id"
-                    :items="years"
-                    disabled
+                    item-text="text"
+                    item-value="value"
+                    :items="namApDungs"
                 />
               </v-col>
               <v-col cols="12" sm="9">
@@ -29,7 +28,6 @@
                     item-text="name"
                     item-value="id"
                     :items="categories"
-                    disabled
                 />
               </v-col>
             </v-row>
@@ -47,19 +45,19 @@
               <tr>
                 <th>STT</th>
                 <th>Tiêu chí</th>
-                <th>Điểm lớn nhất</th>
-                <th>Tự đánh giá</th>
-                <th>Đính kèm</th>
-                <th>Ghi chú tự đánh giá</th>
-                <th>Thẩm định</th>
-                <th>Ghi chú thẩm định</th>
-                <th>Ý kiến đơn vị</th>
+                <th style="width: 75px">Điểm lớn nhất</th>
+                <th style="width: 75px">Tự đánh giá</th>
+                <th style="width: 15%">Ghi chú tự đánh giá</th>
+                <th style="width: 75px">Thẩm định</th>
+                <th style="width: 15%">Ghi chú thẩm định</th>
+                <th style="width: 15%">Ý kiến đơn vị</th>
               </tr>
               </thead>
               <tbody>
               <template v-for="(item, idx) in iData">
                 <template v-if="item.danhDauCau < 2">
-                  <CauHoi :key="item + idx" :question="item"/>
+                  <CauHoi :key="item + idx" :question="item" :nam-ap-dung="namApDung.value"
+                          @updateFileDanhGia="(e)=>updateFileDanhGia(item.bangdiem.id,e)"/>
                 </template>
                 <template v-if="item.danhDauCau >= 2">
                   <CauTraLoi :key="item + idx" :question="item"/>
@@ -97,10 +95,10 @@
           </v-card-text>
           <v-divider/>
           <v-card-actions>
-            <v-btn @click="fnExportToWord" color="blue" dark small>
-              <v-icon>mdi-file-export</v-icon>
-              Xuất file
-            </v-btn>
+<!--            <v-btn @click="fnExportToWord" color="blue" dark small>-->
+<!--              <v-icon>mdi-file-export</v-icon>-->
+<!--              Xuất file-->
+<!--            </v-btn>-->
             <v-spacer/>
             <v-btn
                 color="primary"
@@ -208,7 +206,8 @@ export default {
       iData: [],
       loading: false,
       questions: [],
-      year: new Date().getFullYear(),
+      namApDung: 0,
+      namApDungs: [],
       categoryId: 0,
       categories: [],
       isSubmitting: false,
@@ -216,27 +215,14 @@ export default {
       total: 0,
       total1: 0,
       total2: 0,
-      dialog: false
+      dialog: false,
     }
   },
   computed: {
     ...mapState('khaoSatStore', ['bangDiem', 'bangYKien', 'capNhatFileDanhGia', 'cauHoi']),
-    years() {
-      const year = []
-      const current = (new Date().getFullYear()) + 2
-      for (let i = 2022; i < current; i++) {
-        year.push({
-          id: i,
-          name: `Năm ${i}`
-        })
-      }
-      return year.reverse()
-    }
-  },
+     },
   watch: {
-    year() {
-      this.categoryId = 0
-      this.categories = []
+    namApDung(){
       this.data = []
       this.fnGetDanhMuc()
     },
@@ -260,21 +246,30 @@ export default {
     }
   },
   created() {
-    this.fnGetDanhMuc()
+    this.fnGetNamApDung()
   },
   methods: {
+    fnGetNamApDung() {
+      this.$axios.get('auth/khao-sat/danh-muc/select-nam-ap-dung').then((res) => {
+        this.namApDungs = res.data.data.map((i) => ({
+          value: i,
+          text: i
+        }))
+        this.namApDung = this.namApDungs[0]
+      })
+    },
     async fnExportToWord() {
-      await this.$axios.post('auth/file-manager/export-to-word', {
+      await this.$axios.post('auth/file-manager/export-to-word/bien-ban', {
         bangDiem: this.bangDiem,
         cauHoi: this.cauHoi,
         danhMuc: this.categoryId,
         donVi: this.$route.params.orgId
       }).then((res) => {
-        window.location.href = process.env.VUE_APP_BASE_URL + 'storage/files/BienBan/' + res.data.file
+        window.location.href = process.env.VUE_APP_BASE_URL + 'storage/BienBan/' + res.data.file
       })
     },
     async fnGetDanhMuc() {
-      await this.$axios.get('auth/khao-sat/tu-danh-gia/danh-muc', {params: {namApDung: this.year}}).then((res) => {
+      await this.$axios.get('auth/khao-sat/tu-danh-gia/danh-muc', {params: {namApDung: this.namApDung.value}}).then((res) => {
         this.categories = (res.data?.data).map(item => ({
           id: item.id,
           name: item.tenDanhMuc
@@ -336,11 +331,18 @@ export default {
       this.isSubmitting = true
       this.dialog = true
     },
+    updateFileDanhGia(id, file) {
+      this.$axios.post('auth/khao-sat/tu-danh-gia/update-file-danh-gia', {
+        id: id,
+        fileDanhGia: JSON.stringify(file)
+      }).then(() => {
+        this.fnSendYKien(true)
+      })
+    },
     fnSendYKien(isSave) {
       this.$axios.post('auth/khao-sat/tu-danh-gia/gui-y-kien', {
         maDanhMuc: this.categoryId,
         bangYKien: this.bangYKien,
-        capNhatFileDanhGia: this.capNhatFileDanhGia,
         isSave: isSave
       })
           .then((res) => {
@@ -375,14 +377,6 @@ table#guiykien {
     textarea {
       font-size: 12px;
     }
-  }
-
-  tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-
-  tr:hover {
-    background-color: #ddd;
   }
 }
 </style>

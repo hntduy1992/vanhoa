@@ -77,7 +77,7 @@
                       <span class="ml-2">Tải về</span>
                     </v-btn>
                   </template>
-                  <span>{{ value.split('/').pop() }}</span>
+                  <span>{{ value.filename}}</span>
                 </v-tooltip>
 
               </template>
@@ -91,12 +91,28 @@
                 <span class="font-weight-bold">{{ parseFloat(value).toFixed(2) }}</span>
               </template>
               <template #[`item.trangThaiHienTai`]="{ value, item }">
+                <v-chip
+                    v-if="value === 1"
+                    close-icon="mdi-close-outline"
+                    color="green"
+                    outlined
+                >
+                  Tự chấm điểm
+                </v-chip>
+                <v-chip
+                    v-if="value === 2"
+                    close-icon="mdi-close-outline"
+                    color="purple"
+                    outlined
+                >
+                  Đã gởi điểm, chờ thẩm định
+                </v-chip>
                 <v-btn
                     v-if="value === 3 && item.dathamdinh === 0"
                     small
                     outlined
                     color="error"
-                    @click="openDialog(item.id)"
+                    @click="openDialog(item)"
                 >
                   Đang thẩm định
                 </v-btn>
@@ -136,7 +152,7 @@
                     small
                     text
                     color="#bf213c"
-                    @click="openDialog(item.id)"
+                    @click="openDialog(item)"
                 >
                   Trả thẩm định
                 </v-btn>
@@ -185,11 +201,11 @@
                   >
                     <td><strong>{{ item.tenDonVi }}</strong></td>
                     <td>
-                      <span v-if="item.trangThai == 1">Đã thẩm định</span>
+                      <span v-if="item.trangThai === 1">Đã thẩm định</span>
                       <span v-else class="error--text font-weight-bold">Chưa thẩm định</span>
                     </td>
                     <td>
-                      <v-btn v-if="item.trangThai == 1" color="red" class="white--text"
+                      <v-btn v-if="item.trangThai === 1" color="red" class="white--text"
                              elevation="2" small rounded @click="fnConfirmReturn(item)">
                         Trả thẩm định
                       </v-btn>
@@ -391,16 +407,15 @@ export default {
         params: {
           namApDung: this.year,
           categoryId: this.categoryId,
-          donVi: donVi
+          donVi: donVi.id
         }
       }).then((res) => {
         this.desserts = (res.data?.data).map(item => ({
           id: item.id,
-          maDonViDanhGia: donVi,
+          maDonViDanhGia: donVi.id,
           tenDonVi: item.tenDonVi,
           trangThai: item.trangThai
         }))
-        console.log('---------', this.desserts)
         //this.categoryId = this.categories[0]?.id
       }).catch()
     },
@@ -422,8 +437,8 @@ export default {
     async fnSubmit() {
 
     },
-    download(fileName) {
-      return process.env.VUE_APP_BASE_URL + 'storage/' + fileName.fileUrl
+    download(file) {
+      return process.env.VUE_APP_BASE_URL + 'storage/' + file.fileUrl
     },
     openDialog(donVi) {
       this.dialog = true;

@@ -108,17 +108,17 @@
                       clearable
                       @change="upload"
                       class="me-2"
-                      :disabled="(fileTongHop!=null)"
+                      :disabled="(fileBienBan!==null)"
                   />
                   <v-btn
                       icon
                       color="red"
                       @click="clearFile"
-                      v-if="fileTongHop"
+                      v-if="fileBienBan"
                   >
                     <v-icon>mdi-refresh</v-icon>
                   </v-btn>
-                  <v-tooltip v-if="fileTongHop" :text="fileTongHop.fileName">
+                  <v-tooltip v-if="fileBienBan" :text="fileBienBan.fileName">
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
                           color="blue-grey"
@@ -141,7 +141,6 @@
                   Biên bản
                 </span>
                       </v-btn>
-
                     </template>
                   </v-tooltip>
                 </div>
@@ -151,7 +150,7 @@
             <v-btn
                 color="error"
                 :loading="isSubmitting"
-                :disabled="disableSubmit"
+                :disabled="disableSubmit || trangThaiHienTai>3 || !fileBienBan"
                 @click.stop="fnSubmit"
             >
               Gửi điểm
@@ -228,7 +227,6 @@ export default {
         }
       ],
       dialog: false,
-      // category: {},
       iData: [],
       loading: false,
       questions: [],
@@ -240,7 +238,8 @@ export default {
       disableSubmit: true,
       total: 0,
       total1: 0,
-      fileTongHop: null,
+      fileBienBan: null,
+      trangThaiHienTai: null,
       headers: [
         {
           text: 'STT',
@@ -251,30 +250,29 @@ export default {
         {
           text: 'Tiêu chí',
           value: 'name',
-          width: 260
         },
         {
           text: 'Điểm tối đa',
           value: 'maxScore',
-          width: 55,
+          width: '10%',
           align: 'center'
         },
         {
           text: 'Tự đánh giá',
           value: 'year',
-          width: 75,
+          width: '10%',
           align: 'center'
         },
         {
           text: 'Đính kèm',
           value: 'year',
-          width: 80,
+          width: '20%',
           align: 'center'
         },
         {
           text: 'Ghi chú',
           value: 'year',
-          width: 80,
+          width: '20%',
           align: 'center'
         }
       ]
@@ -370,17 +368,18 @@ export default {
       this.$axios.post('auth/khao-sat/tu-danh-gia/kiem-tra-hop-le', {
         maDanhMuc: this.categoryId
       }).then((res) => {
-            this.disableSubmit = !res.data.data
-            this.$store.commit('khaoSatStore/kiemTraTuDanhGia', this.disableSubmit)
-        this.fileTongHop = JSON.parse(res.data.fileTongHop)
-          }).catch()
+        this.disableSubmit = !res.data.data
+        this.trangThaiHienTai = res.data.trangThai
+        this.$store.commit('khaoSatStore/kiemTraTuDanhGia', this.disableSubmit)
+        this.fileBienBan = JSON.parse(res.data.fileBienBan)
+      }).catch()
     },
     fnSubmit() {
-      if (this.fileTongHop != null) {
+      if (this.fileBienBan != null) {
         this.isSubmitting = true
         this.$axios.post('auth/khao-sat/tu-danh-gia/gui-diem', {
           maDanhMuc: this.categoryId,
-          fileName: JSON.stringify(this.fileTongHop)
+          fileName: JSON.stringify(this.fileBienBan)
         })
             .then((res) => {
               this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
@@ -393,7 +392,7 @@ export default {
       }
     },
     download() {
-      return process.env.VUE_APP_BASE_URL + 'storage/' + this.fileTongHop.fileUrl
+      return process.env.VUE_APP_BASE_URL + 'storage/' + this.fileBienBan.fileUrl
     },
     upload(files) {
       this.loading = true
@@ -411,16 +410,16 @@ export default {
       })
           .then((res) => {
             if (res.data.success) {
-              this.fileTongHop = {fileUrl: res.data.fileUrl, fileName: res.data.fileName}
-              this.fnSubmit()
+              this.fileBienBan = {fileUrl: res.data.fileUrl, fileName: res.data.fileName}
             }
           }).catch()
           .finally(() => {
+            this.fnSubmit()
             this.loading = false
           })
     },
     clearFile() {
-      this.fileTongHop = null
+      this.fileBienBan = null
     }
   }
 }

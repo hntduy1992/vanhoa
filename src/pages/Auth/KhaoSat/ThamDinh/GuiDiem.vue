@@ -48,10 +48,10 @@
               <tr>
                 <th>STT</th>
                 <th>Tiêu chí</th>
-                <th>Điểm lớn nhất</th>
-                <th>Tự đánh giá</th>
+                <th style="width: 75px">Điểm lớn nhất</th>
+                <th style="width: 75px">Tự đánh giá</th>
                 <th>Ghi chú tự đánh giá</th>
-                <th>Thẩm định</th>
+                <th style="width: 75px">Thẩm định</th>
                 <th style="width: 15vw">Ghi chú thẩm định</th>
                 <th v-if="$route.query.thamDinhLai == 1">Ý kiến đơn vị</th>
               </tr>
@@ -96,6 +96,14 @@
           </v-card-text>
           <v-divider/>
           <v-card-actions>
+            <v-btn
+                color="info"
+                :loading="isSubmitting"
+                :disabled="disableSubmit"
+                @click.stop="fnChamLai"
+            >
+              Chấm lại
+            </v-btn>
             <v-spacer/>
             <v-btn
                 color="error"
@@ -282,6 +290,12 @@ export default {
             this.disableSubmit = !res.data.data
             this.$store.commit('khaoSatStore/kiemTraThamDinh', this.disableSubmit)
           }).catch()
+    },
+    fnChamLai() {
+      this.$router.push({
+        name: 'ThamDinhChamDiem',
+        query: {orgId: this.donViDanhGia.id, categoryId: this.categoryId}
+      })
     },
     fnSubmit() {
       this.isSubmitting = true

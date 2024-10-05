@@ -112,9 +112,8 @@ export default {
           this.$store.dispatch('authStore/auth', res.data.data)
           window.location.href = '/Auth/Dashboard'
         }
-      }).catch((e) => {
-        // eslint-disable-next-line no-console
-        console.log('e = ', e)
+      }).catch(() => {
+        this.$store.dispatch('SnackbarStore/showSnackBar', {success:false,message:'Đăng nhập thất bại'})
       }).finally(() => {
         this.loading = false
       })

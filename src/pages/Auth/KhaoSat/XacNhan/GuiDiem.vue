@@ -37,6 +37,7 @@
         </v-card>
       </v-col>
       <v-col cols="12">
+        <h3 class="text-uppercase text-center">{{ donViDanhGia }}</h3>
         <v-card>
           <v-card-text>
             <table
@@ -47,12 +48,11 @@
               <tr>
                 <th>STT</th>
                 <th>Tiêu chí</th>
-                <th>Điểm lớn nhất</th>
-                <th>Tự đánh giá</th>
-                <th>Đính kèm</th>
+                <th style="width: 75px">Điểm lớn nhất</th>
+                <th style="width: 75px">Tự đánh giá</th>
                 <th>Ghi chú tự đánh giá</th>
-                <th>Thẩm định</th>
-                <th>Ghi chú thẩm định</th>
+                <th style="width: 75px">Thẩm định</th>
+                <th style="width: 15vw">Ghi chú thẩm định</th>
               </tr>
               </thead>
               <tbody>
@@ -106,7 +106,7 @@
                 v-if="tinhTrangHienTai == 4"
                 color="primary"
                 :loading="isSubmitting"
-                :disabled="disableSubmit"
+                :disabled="!disableSubmit || tinhTrangHienTai===8"
                 @click.stop="fnKetThuc"
             >
               Kết thúc
@@ -115,10 +115,10 @@
             <v-btn
                 color="error"
                 :loading="isSubmitting"
-                :disabled="disableSubmit || tinhTrangHienTai == 6"
+                :disabled="disableSubmit"
                 @click.stop="fnSubmit"
             >
-              Lưu lại
+              Xác nhận và chờ ý kiến
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -155,7 +155,7 @@ export default {
         {
           text: 'Xác Nhận',
           disabled: false,
-          href: '/Auth/KhaoSat/XacNhan/GuiDiem'
+          href: '/Auth/KhaoSat/XacNhan'
         }
       ],
       category: {},
@@ -172,6 +172,7 @@ export default {
       total1: 0,
       total2: 0,
       tinhTrangHienTai: 0,
+      donViDanhGia:''
     }
   },
   computed: {
@@ -215,16 +216,24 @@ export default {
     this.categoryId = this.$route.query.categoryId
     await this.fnGetDanhMuc()
     await this.fnGetAvailable()
+    this.$axios.get(`auth/don-vi/id/${this.$route.params.orgId}`).then(res => {
+      this.donViDanhGia = res.data.data.tenDonVi
+      this.breadcrumbs.push({
+        text: this.donViDanhGia,
+        disabled: false,
+        href: '/Auth/KhaoSat/XacNhan/' + this.$route.params.orgId
+      })
+    })
   },
   methods: {
     async fnExportToWord() {
-      await this.$axios.post('auth/file-manager/export-to-word', {
+      await this.$axios.post('auth/file-manager/export-to-word/xac-nhan', {
         bangDiem: this.bangDiem,
         cauHoi: this.cauHoi,
         danhMuc: this.categoryId,
-        donVi: this.$route.params.orgId
+        maDonVi: this.$route.params.orgId
       }).then((res) => {
-        window.location.href = process.env.VUE_APP_BASE_URL + 'storage/files/BienBan/' + res.data.file
+        window.location.href = process.env.VUE_APP_BASE_URL + 'storage/XacNhan/' + res.data.file
       })
     },
     async fnGetDanhMuc() {
@@ -287,9 +296,9 @@ export default {
         maDanhMuc: this.categoryId,
         maDonVi: this.$route.params.orgId
       })
-          .then(() => {
-            //  this.disableSubmit = !res.data.data
-            this.disableSubmit = false
+          .then((res) => {
+            this.tinhTrangHienTai = res.data.data
+            this.disableSubmit = this.tinhTrangHienTai === 4
             this.$store.commit('khaoSatStore/kiemTraThamDinh', this.disableSubmit)
           }).catch()
     },

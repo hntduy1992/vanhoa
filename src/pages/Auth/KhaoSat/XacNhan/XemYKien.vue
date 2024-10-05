@@ -12,24 +12,22 @@
             <v-row>
               <v-col cols="12" sm="3">
                 <v-select
-                    v-model="year"
+                    v-model="namApDung"
                     dense
                     label="Năm đánh giá"
-                    item-text="name"
-                    item-value="id"
-                    :items="years"
-                    disabled
+                    item-text="text"
+                    item-value="value"
+                    :items="namApDungs"
                 />
               </v-col>
               <v-col cols="12" sm="9">
                 <v-autocomplete
-                    v-model="tempCatId"
+                    v-model="categoryId"
                     dense
                     label="Bộ tiêu chí"
                     item-text="name"
                     item-value="id"
                     :items="categories"
-                    disabled
                 />
               </v-col>
             </v-row>
@@ -37,6 +35,7 @@
         </v-card>
       </v-col>
       <v-col cols="12">
+        <h3 class="text-uppercase text-center">{{ donViDanhGia }}</h3>
         <v-card>
           <v-card-text>
             <table
@@ -47,13 +46,12 @@
               <tr>
                 <th>STT</th>
                 <th>Tiêu chí</th>
-                <th>Điểm lớn nhất</th>
-                <th>Tự đánh giá</th>
-                <th>Đính kèm</th>
+                <th style="width: 75px">Điểm lớn nhất</th>
+                <th style="width:  75px">Tự đánh giá</th>
                 <th>Ghi chú tự đánh giá</th>
-                <th>Thẩm định</th>
-                <th>Ghi chú thẩm định</th>
-                <th>Ý kiến đơn vị</th>
+                <th style="width:  75px">Thẩm định</th>
+                <th style="width: 15%">Ghi chú thẩm định</th>
+                <th style="width: 15%">Ý kiến đơn vị</th>
               </tr>
               </thead>
               <tbody>
@@ -107,12 +105,20 @@
             </v-btn>
             <v-spacer/>
             <v-btn
+                color="info"
+                :loading="isSubmitting"
+                :disabled="!disableSubmit"
+                @click="fnChangeState"
+            >
+              Thẩm định lại
+            </v-btn>
+            <v-btn
                 color="error"
                 :loading="isSubmitting"
                 :disabled="disableSubmit"
                 @click.stop="fnSubmit"
             >
-              Lưu lại
+              Xác nhận và kết thúc
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -156,35 +162,23 @@ export default {
       iData: [],
       loading: false,
       questions: [],
-      year: new Date().getFullYear(),
+      namApDung: 0,
+      namApDungs: [],
       categoryId: 0,
-      tempCatId: 0,
       categories: [],
       isSubmitting: false,
       disableSubmit: true,
       total: 0,
       total1: 0,
-      total2: 0
+      total2: 0,
+      donViDanhGia: null
     }
   },
   computed: {
     ...mapState('khaoSatStore', ['bangDiem', 'cauHoi']),
-    years() {
-      const year = []
-      const current = (new Date().getFullYear()) + 2
-      for (let i = 2022; i < current; i++) {
-        year.push({
-          id: i,
-          name: `Năm ${i}`
-        })
-      }
-      return year.reverse()
-    }
   },
   watch: {
-    year() {
-      this.categoryId = 0
-      this.categories = []
+    namApDung() {
       this.data = []
       this.fnGetDanhMuc()
     },
@@ -204,35 +198,49 @@ export default {
     }
   },
   created() {
-    this.categoryId = this.$route.query.categoryId
-    this.fnGetDanhMuc()
+    this.fnGetNamApDung()
+    this.$axios.get(`auth/don-vi/id/${this.$route.params.orgId}`).then(res => {
+      this.donViDanhGia = res.data.data.tenDonVi
+      this.breadcrumbs.push({
+        text: this.donViDanhGia,
+        disabled: false,
+        href: '/Auth/KhaoSat/XacNhan/'+this.$route.params.orgId
+      })
+    })
+
   },
   methods: {
+    fnGetNamApDung() {
+      this.$axios.get('auth/khao-sat/danh-muc/select-nam-ap-dung').then((res) => {
+        this.namApDungs = res.data.data.map((i) => ({
+          value: i,
+          text: i
+        }))
+        this.namApDung = this.namApDungs[0]
+      })
+    },
     async fnExportToWord() {
-      await this.$axios.post('auth/file-manager/export-to-word', {
+      await this.$axios.post('auth/file-manager/export-to-word/bien-ban', {
         bangDiem: this.bangDiem,
         cauHoi: this.cauHoi,
         danhMuc: this.categoryId,
         donVi: this.$route.params.orgId
       }).then((res) => {
-        window.location.href = process.env.VUE_APP_BASE_URL + 'storage/files/BienBan/' + res.data.file
+        window.location.href = process.env.VUE_APP_BASE_URL + 'storage/BienBan/' + res.data.file
       })
     },
     async fnGetDanhMuc() {
-      await this.$axios.get('auth/khao-sat/xac-nhan/danh-muc', {params: {namApDung: this.year}}).then((res) => {
+      await this.$axios.get('auth/khao-sat/xac-nhan/danh-muc', {params: {namApDung: this.namApDung.value,maDonVi: this.$route.params.orgId}}).then((res) => {
         this.categories = (res.data?.data).map(item => ({
           id: item.id,
           name: item.tenDanhMuc
         }))
-        // this.categoryId = this.categories[0]?.id
-        setTimeout(() => {
-          this.categoryId = this.$route.query.categoryId
-        }, 1000)
-      }).catch()
-          .finally(() => {
-            this.tempCatId = parseInt(this.$route.query.categoryId.toString()) == 0 ? this.categories[0].id : parseInt(this.$route.query.categoryId.toString())
-          })
-      await this.fnGetAvailable()
+        this.categoryId = this.categories[0]?.id
+        this.fnGetAvailable()
+      }).catch((err) => {
+        // this.$store.dispatch('SnackbarStore/showSnackBar', err)
+        console.log(err)
+      })
     },
     fnGetCauHoi() {
       this.$axios.get('auth/khao-sat/xac-nhan/cau-hoi', {
@@ -282,16 +290,33 @@ export default {
             this.$store.commit('khaoSatStore/kiemTraThamDinh', this.disableSubmit)
           }).catch()
     },
+    fnChangeState(){
+      this.isSubmitting = true
+      this.$axios.post('auth/khao-sat/xac-nhan/khoi-phuc-trang-thai', {
+        maDonVi: this.$route.params.orgId,
+        namApDung: this.namApDung.value,
+        maDanhMuc: this.categoryId,
+      })
+          .then((res) => {
+            this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
+          }).catch().finally(() => {
+        this.isSubmitting = false
+        this.fnGetAvailable()
+      })
+    },
     fnSubmit() {
       this.isSubmitting = true
       this.$axios.post('auth/khao-sat/xac-nhan/gui-diem-tong-hop', {
         maDonVi: this.$route.params.orgId,
-        namApDung: this.year,
+        namApDung: this.namApDung.value,
         maDanhMuc: this.categoryId,
         diem: this.total2
       })
           .then((res) => {
+            this.disableSubmit = !res.data.data
             this.$store.dispatch('SnackbarStore/showSnackBar', res.data)
+            // this.$axios.post('uth/file-manager/export-to-word/bien-ban',)
+            this.fnExportToWord()
           }).catch().finally(() => {
         this.isSubmitting = false
         this.fnGetAvailable()
@@ -323,12 +348,5 @@ table#xacnhan {
     }
   }
 
-  tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-
-  tr:hover {
-    background-color: #ddd;
-  }
 }
 </style>
