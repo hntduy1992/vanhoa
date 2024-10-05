@@ -1,43 +1,33 @@
 <template>
   <LayoutDefault>
-    <v-tabs
-        fixed-tabs
-        background-color="var(--primary-color)"
-        dark
-    >
+    <v-tabs fixed-tabs background-color="var(--primary-color)" dark>
       <v-tab>
         ĐƠN VỊ ĐẠT DANH HIỆU
       </v-tab>
       <v-tab>
         THỐNG KÊ THEO NĂM
       </v-tab>
-      <v-tab-item
-          class="py-2 px-1"
-          :key="1"
-      >
+      <v-tab-item class="py-2 px-1" :key="1">
         <div class="d-flex align-center mb-2" style="width: 150px">
           <label for="selectYear" class="v-label me-2 text-no-wrap">Chọn năm </label>
-          <v-select
-              id="selectYear"
-              v-model="namApDung"
-              item-text="text"
-              item-value="value"
-              solo
-              return-object
-              hide-details
-              :items="namApDungs"
-          />
+          <v-select id="selectYear" v-model="namApDung" item-text="text" item-value="value" solo return-object
+            hide-details :items="namApDungs" />
         </div>
-        <v-row>
-          <v-col cols="12" v-for="(item,i) of data" :key="item.id +'_'+i">
+        <v-row v-if="namApDung">
+          <v-col cols="12" v-for="(item, i) of data" :key="item.id + '_' + i">
             <v-card>
               <v-toolbar dense elevation="4">
                 <h4>{{ item.tenDanhMuc }}</h4>
               </v-toolbar>
               <v-card-text>
-                <v-chart class="chart" autoresize :option="fnLoadChartInfo(item.donVis,item.diemChuan)"/>
+                <v-chart class="chart" autoresize :option="fnLoadChartInfo(item.donVis, item.diemChuan)" />
               </v-card-text>
             </v-card>
+          </v-col>
+        </v-row>
+        <v-row v-else>
+          <v-col cols="12">
+            <h4>Không có dữ liệu</h4>
           </v-col>
         </v-row>
       </v-tab-item>
@@ -54,10 +44,10 @@
 </template>
 
 <script>
-import {use} from 'echarts/core'
-import {CanvasRenderer} from 'echarts/renderers'
-import {BarChart} from 'echarts/charts'
-import {GridComponent, LegendComponent, TitleComponent, TooltipComponent} from 'echarts/components'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { BarChart } from 'echarts/charts'
+import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
 import LayoutDefault from "@/layouts/default";
 import StaticDashboard from "@/pages/Auth/Dashboard/staticDashboard.vue";
