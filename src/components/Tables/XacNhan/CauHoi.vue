@@ -16,9 +16,9 @@
           :class="{ 'font-weight-bold': question.level == 0, 'red--text': question.level === 0}"
       >{{ parseFloat(diemTuDanhGia).toFixed(2) }}</span>
     </td>
-    <td :rowspan="question.danhDauCau == 1 && question.childrenCount > 0 ? question.childrenCount + 1 : false">
-      <template v-if="question.danhDauCau == 1">
-        <div v-if="fileName != null" class="text-center">
+    <td  class="w-cell-100 text-center" :rowspan="question.danhDauCau == 1 && question.childrenCount > 0 ? question.childrenCount + 1 : false">
+      <template v-if="question.danhDauCau === 1">
+        <template v-if="fileName">
           <v-tooltip top color="primary" v-for="(file,index) of fileName" :key="file.fileName+'_'+ index">
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -38,12 +38,12 @@
                 >
                   mdi-cloud-download
                 </v-icon>
-                <span class="ml-2">Tải về</span>
+                <span class="ml-2">{{ file.fileName }}</span>
               </v-btn>
             </template>
-            <span>{{ file.fileName }}</span>
+            <span>Tải về</span>
           </v-tooltip>
-          <div v-if="question.danhDauCau == 1 && ghiChuDanhGia != null" style="width: 150px">
+          <div v-if="question.danhDauCau == 1 && ghiChuDanhGia != null">
             <v-textarea
                 v-model="ghiChuDanhGia"
                 label="Nội dung"
@@ -56,7 +56,7 @@
                 no-resize
             />
           </div>
-        </div>
+        </template>
       </template>
     </td>
     <td class="text-center">
@@ -69,7 +69,7 @@
         class="text-center"
     >
       <template v-if="question.danhDauCau === 1">
-        <div v-if="!question.hasChild" style="width: 150px">
+        <div v-if="!question.hasChild">
           <v-textarea
               v-if="ghiChuThamDinh"
               v-model="ghiChuThamDinh"

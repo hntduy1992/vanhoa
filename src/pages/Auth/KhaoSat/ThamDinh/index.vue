@@ -64,7 +64,7 @@
                 >
                   {{ data.filter(x => x.trangThaiHienTai === 2 || x.trangThaiHienTai === 6).length }}
                 </v-avatar>
-                Thẩm định
+               Chưa thẩm định
               </v-chip>
               <v-chip
                   class="ma-2"

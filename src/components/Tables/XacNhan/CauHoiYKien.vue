@@ -1,5 +1,5 @@
 <template>
-  <tr>
+  <tr class="border-top">
     <td class="font-weight-bold text-center">
       {{ question.stt }}
     </td>
@@ -16,14 +16,15 @@
           :class="{ 'font-weight-bold': question.level === 0, 'red--text': question.level === 0}"
       >{{ parseFloat(diemTuDanhGia).toFixed(2) }}</span>
     </td>
-    <td :rowspan="question.danhDauCau === 1 && question.childrenCount > 0 ? question.childrenCount + 1 : false" class="text-center">
+    <td :rowspan="question.danhDauCau === 1 && question.childrenCount > 0 ? question.childrenCount + 1 : false"
+        class="w-cell-100 text-center">
       <template v-if="question.danhDauCau === 1">
-        <div v-if="fileName != null">
+        <div v-if="fileName">
           <v-tooltip top color="primary" v-for="(file,index) of fileName" :key="file.fileName + '_'+ index">
             <template v-slot:activator="{ on, attrs }">
               <v-btn
                   color="blue-grey"
-                  class="white--text"
+                  class="mb-2 white--text"
                   elevation="0"
                   small
                   link

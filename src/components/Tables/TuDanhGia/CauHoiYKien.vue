@@ -50,45 +50,41 @@
           />
         </div>
 
-        <div v-if="fileName != null && fileName.length>0" class="text-center">
-          <v-tooltip top color="primary" v-for="(file,index) of fileName" :key="file.fileName + '_' + index">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                  color="blue-grey"
-                  class="ma-2 white--text"
-                  elevation="0"
-                  small
-                  link
-                  target="_blank"
-                  v-bind="attrs"
-                  v-on="on"
-                  :href="download(file)"
-              >
-
-                <span class="ml-2">{{file.fileName}}</span>
-                <v-icon
-                    dark
-                    right
+        <v-list v-if="fileName != null" class="text-center">
+          <v-list-item v-for="(file,index) of fileName" :key="index">
+            <v-tooltip  top color="primary">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    color="blue-grey"
+                    class="white--text"
+                    elevation="0"
+                    small
+                    link
+                    target="_blank"
+                    v-bind="attrs"
+                    v-on="on"
+                    :href="download(file.fileUrl)"
                 >
-                  mdi-cloud-download
-                </v-icon>
-              </v-btn>
-              <v-btn
-                  elevation="2"
-                  icon
-                  small
-                  @click="clearFile(file)"
-                  color="red"
-              >
-                <v-icon>
-                  mdi-delete-circle-outline
-                </v-icon>
-              </v-btn>
-            </template>
-            <span>Tải về</span>
-          </v-tooltip>
-
-        </div>
+                  <span class="ml-2">{{ file.fileName }}</span>
+                  <v-icon
+                      dark
+                      right
+                  >
+                    mdi-cloud-download
+                  </v-icon>
+                </v-btn>
+                <v-btn
+                    icon
+                    color="red"
+                    @click="clearFile(file)"
+                >
+                  <v-icon>mdi-delete-circle-outline</v-icon>
+                </v-btn>
+              </template>
+              <span>Tải về</span>
+            </v-tooltip>
+          </v-list-item>
+        </v-list>
         <div v-if="question.danhDauCau == 1 && ghiChuDanhGia != null">
           <v-textarea
               v-model="ghiChuDanhGia"
@@ -210,8 +206,8 @@ export default {
     }
   },
   methods: {
-    download(file) {
-      return process.env.VUE_APP_BASE_URL + 'storage/' + file.fileUrl
+    download(fileUrl) {
+      return process.env.VUE_APP_BASE_URL + 'storage/' + fileUrl
     },
     upload(files) {
       this.loading = true
@@ -233,11 +229,9 @@ export default {
             if (res.data.success) {
               this.fileName.push({'fileUrl': res.data.fileUrl, 'fileName': res.data.fileName})
               this.capNhatBangDiem()
-              this.$emit('updateFileDanhGia',this.fileName)
+              this.$emit('updateFileDanhGia', this.fileName)
             }
-          }).catch(err => {
-        this.$store.dispatch('SnackbarStore/showSnackBar', err.message)
-      })
+          }).catch()
           .finally(() => {
             this.loading = false
           })

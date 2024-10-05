@@ -112,7 +112,7 @@
                     small
                     outlined
                     color="error"
-                    @click="openDialog(item.id)"
+                    @click="openDialog(item)"
                 >
                   Đang thẩm định
                 </v-btn>
@@ -152,7 +152,7 @@
                     small
                     text
                     color="#bf213c"
-                    @click="openDialog(item.id)"
+                    @click="openDialog(item)"
                 >
                   Trả thẩm định
                 </v-btn>
@@ -201,11 +201,11 @@
                   >
                     <td><strong>{{ item.tenDonVi }}</strong></td>
                     <td>
-                      <span v-if="item.trangThai == 1">Đã thẩm định</span>
+                      <span v-if="item.trangThai === 1">Đã thẩm định</span>
                       <span v-else class="error--text font-weight-bold">Chưa thẩm định</span>
                     </td>
                     <td>
-                      <v-btn v-if="item.trangThai == 1" color="red" class="white--text"
+                      <v-btn v-if="item.trangThai === 1" color="red" class="white--text"
                              elevation="2" small rounded @click="fnConfirmReturn(item)">
                         Trả thẩm định
                       </v-btn>
@@ -407,12 +407,12 @@ export default {
         params: {
           namApDung: this.year,
           categoryId: this.categoryId,
-          donVi: donVi
+          donVi: donVi.id
         }
       }).then((res) => {
         this.desserts = (res.data?.data).map(item => ({
           id: item.id,
-          maDonViDanhGia: donVi,
+          maDonViDanhGia: donVi.id,
           tenDonVi: item.tenDonVi,
           trangThai: item.trangThai
         }))
@@ -429,7 +429,6 @@ export default {
       })
           .then((res) => {
             this.data = res.data.data
-            console.log(this.data)
           })
           .finally(() => {
             this.loading = false
